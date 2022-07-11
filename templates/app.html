@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <title>PHANTOM</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700;800;900&display=swap");
+
+            html,
+            body {
+                overflow-x: hidden !important;
+                height: 100% !important;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                scrollbar-width: thin;
+                scrollbar-color: #2c7ce558 #e3ebf6;
+                background-color: #f5f5f5;
+            }
+
+            div,
+            select,
+            tbody {
+                scrollbar-width: thin;
+                scrollbar-color: #2c7ce558 #e3ebf6;
+            }
+
+            * {
+                font-family: "Inter", sans-serif !important;
+                letter-spacing: 0.04rem;
+                font-weight: 500 !important;
+                color: #202a44;
+            }
+
+            *:focus,
+            *:active {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            body::-webkit-scrollbar,
+            div::-webkit-scrollbar,
+            select::-webkit-scrollbar,
+            tbody::-webkit-scrollbar {
+                width: 0;
+            }
+
+            body::-webkit-scrollbar-thumb,
+            div::-webkit-scrollbar-thumb,
+            select::-webkit-scrollbar-thumb,
+            tbody::-webkit-scrollbar-thumb {
+                background: #2c7ce558;
+            }
+
+            body::-webkit-scrollbar-track,
+            div::-webkit-scrollbar-track,
+            select::-webkit-scrollbar-track tbody::-webkit-scrollbar-track {
+                background: #e3ebf6;
+            }
+
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type="number"] {
+                -moz-appearance: textfield;
+            }
+
+            .hide {
+                display: none;
+            }
+
+            @media screen and (min-width: 992px) {
+                body > div {
+                    display: grid;
+                    overflow: hidden;
+                    height: 100vh;
+                    margin: 0;
+                    grid-template-columns: 75% 24%;
+                    justify-content: space-between;
+                }
+
+                .modal-dialog {
+                    width: 420px;
+                }
+
+                .modal-dialog label {
+                    padding-left: 0.2rem;
+                    font-size: 0.8rem;
+                    color: #202a44 !important;
+                }
+
+                .modal-dialog > div {
+                    background-color: #ffffff;
+                }
+
+                .icon {
+                    display: none;
+                }
+
+                .icon-2 {
+                    display: none;
+                }
+
+                .left-container {
+                    display: grid;
+                    grid-template-rows: 65% 33%;
+                    grid-gap: 2%;
+                }
+
+                .content-div {
+                    background-color: #ffffff;
+                    box-shadow: 0px 1px 10px rgb(0 0 0 / 20%);
+                }
+
+                .right-container {
+                    background-color: #ffffff;
+                    box-shadow: 0px 1px 10px rgb(0 0 0 / 20%);
+                }
+
+                .right-container > div:nth-child(1) > div {
+                    width: 45%;
+                }
+
+                .A > div:first-child > div {
+                    width: calc((100% / 4) - 2rem);
+                    height: 100%;
+                }
+
+                .form-control,
+                .input-group-text,
+                .form-select {
+                    font-size: 0.7rem;
+                }
+
+                p {
+                    font-size: 0.9rem;
+                    text-decoration: underline;
+                }
+
+                .right-container .form-control {
+                    font-size: 1.5rem;
+                    padding: 0 0.75rem;
+                    border: 0;
+                }
+
+                .nav {
+                    transform: rotate(-90deg);
+                    position: absolute;
+                    left: 20px;
+                    bottom: 0;
+                    width: 0;
+                    height: 12%;
+                    flex-wrap: nowrap;
+                }
+
+                .nav-link {
+                    padding-top: 0.1rem;
+                    padding-bottom: 0.1rem;
+                    height: 1.3rem;
+                    color: #202a44 !important;
+                    border-radius: 0 !important;
+                }
+
+                .nav-link.active {
+                    color: #202a44 !important;
+                    background-color: #e9ecef !important;
+                    border-radius: 0 !important;
+                }
+
+                table {
+                    height: 100%;
+                    margin-bottom: 0 !important;
+                }
+
+                thead,
+                tbody {
+                    display: block;
+                    width: 100%;
+                }
+
+                tbody {
+                    height: calc(100% - 1.6rem);
+                    overflow-y: auto;
+                }
+
+                thead tr,
+                tbody tr {
+                    display: table;
+                    width: 100%;
+                }
+
+                .ibs,
+                .pbs {
+                    height: 16px;
+                    width: 16px;
+                    position: absolute;
+                    bottom: 4px;
+                    z-index: 100;
+                    cursor: pointer;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container-fluid py-2 vw-100 vh-100 d-none d-lg-grid">
+            <div class="left-container h-100">
+                <div class="content-div A px-3 py-2">
+                    <div class="d-flex justify-content-between">
+                        <div class="input-group" style="width: calc((100% / 4))">
+                            <span class="input-group-text">Pairs</span>
+                            <select class="form-select form-select-sm" id="c_pairs" aria-label=".form-select-sm" value="Step Index"></select>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text">Timeframe</span>
+                            <select class="form-select form-select-sm" id="timeframe" aria-label=".form-select-sm" value="M15"></select>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text">Lot</span>
+                            <input type="number" class="form-control form-control-sm" id="lot" placeholder="0.10" />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text">Deviation</span>
+                            <input type="number" class="form-control form-control-sm" id="deviation" placeholder="20" />
+                        </div>
+                    </div>
+                    <div id="chart_div" class="pt-3" style="height: calc(100% - 2rem); width: auto"></div>
+                </div>
+                <div class="content-div B py-2 px-3 position-relative" style="font-size: 0.7rem">
+                    <div class="d-flex align-items-start justify-content-end h-100">
+                        <div class="nav nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical" style="transform: rotate(-90deg)">
+                            <button class="nav-link active" id="v-pills-activetrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-activetrades" type="button" role="tab" aria-controls="v-pills-activetrades" aria-selected="true">ACTIVE</button>
+                            <button class="nav-link" id="v-pills-pendingtrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pendingtrades" type="button" role="tab" aria-controls="v-pills-pendingtrades" aria-selected="false">PENDING</button>
+                        </div>
+                        <div class="tab-content h-100" id="v-pills-tabContent" style="width: 98%">
+                            <div class="tab-pane h-100 fade show active" id="v-pills-activetrades" role="tabpanel" aria-labelledby="v-pills-activetrades-tab">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 16%">Symbol</th>
+                                            <th scope="col" style="width: 15%">Ticket</th>
+                                            <th scope="col" style="width: 7%">Type</th>
+                                            <th scope="col" style="width: 7%" class="text-center">Lot</th>
+                                            <th scope="col" style="width: 11%">Stop Loss</th>
+                                            <th scope="col" style="width: 11%">Take Profit</th>
+                                            <th scope="col" style="width: 11%">Entry</th>
+                                            <th scope="col" style="width: 10%">Current</th>
+                                            <th scope="col" style="width: 15%">Profit</th>
+                                            <th scope="col" style="width: 3%">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
+                                                </svg>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="actv"></tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane h-100 fade" id="v-pills-pendingtrades" role="tabpanel" aria-labelledby="v-pills-pendingtrades-tab">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 16%">Symbol</th>
+                                            <th scope="col" style="width: 15%">Ticket</th>
+                                            <th scope="col" style="width: 7%">Type</th>
+                                            <th scope="col" style="width: 7%" class="text-center">Lot</th>
+                                            <th scope="col" style="width: 11%">Stop Loss</th>
+                                            <th scope="col" style="width: 11%">Take Profit</th>
+                                            <th scope="col" style="width: 11%">Entry</th>
+                                            <th scope="col" style="width: 10%">Current</th>
+                                            <th scope="col" style="width: 15%">Profit</th>
+                                            <th scope="col" style="width: 3%">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
+                                                </svg>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pndn"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-container h-100 px-3 py-3 position-relative" id="right-container">
+                <div class="d-flex justify-content-between" style="margin-bottom: 2rem">
+                    <div class="text-center" style="width: 47%">
+                        <label for="stop_loss" class="form-label mb-1" style="font-size: 13px">Stop Loss:</label>
+                        <input type="number" class="form-control text-center" id="stop_loss" placeholder="0.5" step="0.5" />
+                    </div>
+                    <div class="text-center" style="width: 47%">
+                        <label for="take_profit" class="form-label mb-1" style="font-size: 13px">Take Profit:</label>
+                        <input type="number" class="form-control text-center" id="take_profit" placeholder="100" step="20" />
+                    </div>
+                </div>
+
+                <div style="min-height: 4.3rem; margin-bottom: 2rem">
+                    <p class="text-center">Instant Trading</p>
+                    <div class="d-flex justify-content-between">
+                        <div style="width: 47%">
+                            <h4 id="buy" class="text-center p-1">0000.0</h4>
+                            <form action="#" method="post" id="fbuy" novalidate>
+                                <input type="number" class="form-control" name="buy" id="ibuy" hidden />
+                                <button type="submit" class="btn btn-sm btn-outline-success w-100" style="border-radius: 0 25%">BUY</button>
+                            </form>
+                        </div>
+                        <div style="width: 47%">
+                            <h4 id="sell" class="text-center p-1">0000.0</h4>
+                            <form action="#" method="post" id="fsell" novalidate>
+                                <input type="number" class="form-control" name="sell" id="isell" hidden />
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100" style="border-radius: 25% 0">SELL</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="min-height: 4.3rem; margin-bottom: 2rem">
+                    <p class="text-center">Delayed Trading</p>
+                    <div class="d-flex justify-content-between">
+                        <div style="width: 47%">
+                            <form action="#" method="post" id="fsbuy" novalidate>
+                                <input type="number" class="form-control text-center" name="sbuy" id="isbuy" placeholder="0000.0" step="0.1" />
+                                <button type="submit" class="btn btn-sm btn-outline-success w-100 mt-2" style="border-radius: 0 25%">BUY-STOP</button>
+                            </form>
+                        </div>
+                        <div style="width: 47%">
+                            <form action="#" method="post" id="fssell" novalidate>
+                                <input type="number" class="form-control text-center" name="ssell" id="issell" placeholder="0000.0" step="0.1" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100 mt-2" style="border-radius: 25% 0">SELL-STOP</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="min-height: 4.3rem; margin-bottom: 2rem">
+                    <p class="text-center">Double Trading</p>
+                    <div class="d-flex justify-content-between">
+                        <div style="width: 47%">
+                            <h4 id="itr" class="text-center p-1">0000.0</h4>
+                            <form action="#" method="post" id="fditr" novalidate>
+                                <input type="number" class="form-control text-center" name="itr" id="ditr" hidden />
+                                <button type="submit" class="btn btn-sm btn-outline-dark w-100" style="border-radius: 0 25%">Instant</button>
+                            </form>
+                        </div>
+                        <div style="width: 47%">
+                            <form action="#" method="post" id="fdptr" novalidate>
+                                <input type="number" class="form-control text-center" name="ptr" id="dptr" placeholder="0000.0" step="0.1" />
+                                <button type="submit" class="btn btn-sm btn-outline-dark w-100 mt-2" style="border-radius: 25% 0">Pending</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--  -->
+
+                <div class="position-absolute" style="bottom: 10px; width: 90%">
+                    <button type="button" class="btn btn-sm w-100 btn-success" data-bs-toggle="modal" data-bs-target="#autoTr">Auto Trade</button>
+                    <button class="btn btn-sm btn-danger w-100 quit mt-2">Quit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Modal -->
+        <div class="modal fade" id="login" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="border py-2 px-3 w-100">
+                            <h5 class="text-uppercase text-center my-2 text-danger"><span class="text-success">Wel</span>come</h5>
+                            <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p>
+                            <form action="#" id="lgn" method="post">
+                                <div class="mb-3">
+                                    <label for="account" class="form-label">Account:</label>
+                                    <input type="text" class="form-control" id="account" placeholder="20254407" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password:</label>
+                                    <input type="password" class="form-control" id="password" placeholder="************" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="server" class="form-label">Server:</label>
+                                    <input type="text" class="form-control" id="server" placeholder="server" required />
+                                </div>
+                                <div class="mb-2 mt-4 text-end">
+                                    <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100" id="bt1">Continue</button>
+                                    <button type="button" class="btn btn-sm btn-dark px-4 w-100 hide" id="bt2" disabled>
+                                        <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
+                                        Please Wait...
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notif Modal -->
+        <div class="modal fade" id="Notif" tabindex="-1" aria-labelledby="NotifLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body msg text-capitalize text-center p-2 text-danger"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auto Trader Modal -->
+        <div class="modal fade" id="autoTr" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="border py-2 px-3 w-100">
+                            <h5 class="text-uppercase text-center my-2 text-danger"><span class="text-success">Auto</span>Trading</h5>
+                            <!-- <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p> -->
+                            <form action="#" id="atr" method="post">
+                                <div class="mb-3">
+                                    <label for="atr_lot" class="form-label">Lot:</label>
+                                    <input type="number" class="form-control" id="atr_lot" placeholder="0.0" min="0.1" step="any" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="atr_pairs" class="form-label">Pair:</label>
+                                    <select class="form-select form-select-sm" id="atr_pairs" aria-label=".form-select-sm" value="Step Index"></select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="atr_ntr" class="form-label">No of Trades per Time (min 2):</label>
+                                    <input type="number" class="form-control" id="atr_ntr" placeholder="2" min="2" step="2" required />
+                                </div>
+                                <div class="mb-3 hide">
+                                    <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100 atsm" ss>Continue</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-sm btn-danger stpatr">Stop</button>
+                        <button type="button" class="btn btn-sm btn-success subatr">Start</button>
+                        <button type="button" class="btn btn-sm btn-success ntatr hide" disabled>Running</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        <script>
+            // Dom Element
+            const showBtn = document.getElementById("btn-show");
+            const hideBtn = document.getElementById("btn-hide");
+            const rightContainerEl = document.getElementById("right-container");
+            const c_pairs = document.getElementById("c_pairs");
+            const atr_pairs = document.getElementById("atr_pairs");
+            const timeframes = document.getElementById("timeframe");
+            const lot = document.getElementById("lot");
+            const atr_lot = document.getElementById("atr_lot");
+            const atr_ntr = document.getElementById("atr_ntr");
+            const sl = document.getElementById("stop_loss");
+            const tp = document.getElementById("take_profit");
+            const devtn = document.getElementById("deviation");
+            const buyCont = document.getElementById("buy");
+            const sellCont = document.getElementById("sell");
+            const ibuy = document.getElementById("ibuy");
+            const isell = document.getElementById("isell");
+            const itr = document.getElementById("itr");
+            const ditr = document.getElementById("ditr");
+            const fbuy = document.querySelector("form#fbuy");
+            const fsell = document.querySelector("form#fsell");
+            const fsbuy = document.querySelector("form#fsbuy");
+            const fssell = document.querySelector("form#fssell");
+            const fditr = document.querySelector("form#fditr");
+            const fdptr = document.querySelector("form#fdptr");
+            const tbody_1 = document.getElementById("actv");
+            const tbody_2 = document.getElementById("pndn");
+            const quit = document.querySelector("button.quit");
+            const start_at = document.querySelector("button.atsm");
+            const stop_at = document.querySelector("button.stpatr");
+            const submit_atr = document.querySelector("button.subatr");
+            const notf_atr = document.querySelector("button.ntatr");
+            const form = document.querySelector("form#lgn");
+            const fatr = document.querySelector("form#atr");
+            const notifdd = document.querySelector("p.notifdd");
+            const bt1 = document.getElementById("bt1");
+            const bt2 = document.getElementById("bt2");
+            const box_l = new bootstrap.Modal(document.getElementById("login"), { backdrop: "static" });
+            const box_2 = new bootstrap.Modal(document.getElementById("Notif"), {});
+            const box_3 = new bootstrap.Modal(document.getElementById("autoTr"), { backdrop: "static" });
+            const msg = document.querySelector("div.msg");
+            let { loggedin } = JSON.parse(localStorage.getItem("default")) || false;
+            let today = new Date(Date.now());
+            let chart = false;
+
+            // Form Submit
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const account = form.elements[0].value;
+                const password = form.elements[1].value;
+                const server = form.elements[2].value;
+
+                const response = fetch("/auth", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        account: account,
+                        password: password,
+                        server: server,
+                    }),
+                });
+
+                bt1.classList.add("hide");
+                bt2.classList.remove("hide");
+
+                if ((await response).status === 200) {
+                    // Start App
+                    loggedin = true;
+                    setDefault();
+                    getPairs();
+                    timeframe();
+                    lot_size();
+                    stop_loss();
+                    take_profit();
+                    deviation();
+                    chart_display();
+                    buy_sell();
+                    buy_Order();
+                    buy_stop_Order();
+                    sell_Order();
+                    sell_stop_Order();
+                    double_instant_Order();
+                    double_pending_Order();
+                    trades();
+                    close_app();
+
+                    setInterval(() => {
+                        buy_sell();
+                        chart_display();
+                        trades();
+                    }, 500);
+
+                    box_l.hide();
+                } else {
+                    const data = await (await response).json();
+                    notifdd.innerHTML = data.message[1].split(":")[1];
+                    bt1.classList.remove("hide");
+                    bt2.classList.add("hide");
+
+                    setTimeout(() => {
+                        notifdd.innerHTML = "";
+                    }, 5000);
+                }
+            });
+
+            // Initialize Default Values
+            // ==============================================================================================
+            const setDefault = () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default")) || false;
+
+                if (!defaultValues) {
+                    const data = {
+                        loggedin: true,
+                        pair: "Step Index",
+                        timeframe: "M15",
+                        lot: 0.2,
+                        deviation: 20,
+                        sl: 0.5,
+                        tp: 100,
+                        ntr: 2,
+                    };
+
+                    localStorage.setItem("default", JSON.stringify(data));
+                } else {
+                    defaultValues.loggedin = true;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                }
+            };
+
+            // Get Currency Pairs
+            // ==============================================================================================
+            const getPairs = async () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const response = await fetch("/pairs");
+                const data = await response.json();
+                let options = "";
+
+                // Loop
+                for (const prop of data) {
+                    options += `<option value=${prop.replaceAll(" ", "_")} ${defaultValues.pair === prop ? "selected" : ""}>${prop}</option>`;
+                }
+
+                c_pairs.innerHTML = options;
+                atr_pairs.innerHTML = options;
+
+                c_pairs.addEventListener("change", (e) => {
+                    defaultValues.pair = e.target.value.replaceAll("_", " ");
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+
+                    chart_display();
+                    buy_sell();
+                });
+            };
+
+            // Get Timeframes
+            // ==============================================================================================
+            const timeframe = async () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const response = await fetch("/timeframe");
+                const data = await response.json();
+                let options = "";
+
+                // Loop
+                for (const prop of data) {
+                    options += `<option value=${prop} ${defaultValues.timeframe === prop ? "selected" : ""}>${prop}</option>`;
+                }
+
+                timeframes.innerHTML = options;
+
+                timeframes.addEventListener("change", (e) => {
+                    defaultValues.timeframe = e.target.value.replaceAll("_", " ");
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+
+                    chart_display();
+                });
+            };
+
+            // Get Lot Size
+            // ==============================================================================================
+            const lot_size = () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                lot.value = defaultValues.lot;
+                atr_lot.value = defaultValues.lot;
+                atr_ntr.value = defaultValues.ntr;
+
+                lot.addEventListener("keyup", (e) => {
+                    defaultValues.lot = e.target.value;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                });
+            };
+
+            // Get stop loss
+            // ==============================================================================================
+            const stop_loss = () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                sl.value = defaultValues.sl;
+
+                sl.addEventListener("keyup", (e) => {
+                    defaultValues.sl = e.target.value;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                });
+            };
+
+            // Get Take Profit
+            // ==============================================================================================
+            const take_profit = () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                tp.value = defaultValues.tp;
+
+                tp.addEventListener("keyup", (e) => {
+                    defaultValues.tp = e.target.value;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                });
+            };
+
+            // Get Deviation
+            // ==============================================================================================
+            const deviation = () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                devtn.value = defaultValues.deviation;
+
+                devtn.addEventListener("keyup", (e) => {
+                    defaultValues.deviation = e.target.value;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                });
+            };
+
+            // RenderChart
+            // ==============================================================================================
+            google.charts.load("current", { packages: ["corechart"] });
+
+            function drawChart(_data) {
+                var data = google.visualization.arrayToDataTable([..._data], true);
+
+                var options = {
+                    legend: "none",
+                    fontName: "Inter",
+                    fontSize: 12,
+                    candlestick: {
+                        fallingColor: { strokeWidth: 0, fill: "#a52714" }, // red
+                        risingColor: { strokeWidth: 0, fill: "#0f9d58" }, // green
+                    },
+                    chartArea: {
+                        top: 20,
+                        bottom: 55,
+                        width: "94%",
+                        height: "75%",
+                        left: 5,
+                    },
+                    hAxis: {
+                        textStyle: {
+                            color: "#202a44",
+                            fontName: "Inter",
+                            fontSize: 9,
+                            bold: true,
+                        },
+                        slantedText: true,
+                        slantedTextAngle: 90,
+                        showTextEvery: 1,
+                        viewWindowMode: "pretty",
+                    },
+                    series: {
+                        0: { targetAxisIndex: 1 },
+                    },
+                    vAxes: {
+                        0: { textPosition: "none" },
+                        1: {},
+                    },
+                    vAxis: {
+                        gridlines: {
+                            color: "#f5f5f5",
+                            count: 10,
+                        },
+                        minorGridlines: {
+                            color: "transparent",
+                        },
+                        textStyle: {
+                            color: "#202a44",
+                            fontName: "Inter",
+                            fontSize: 9,
+                            bold: true,
+                        },
+                        baselineColor: "red",
+                    },
+                };
+
+                if (chart) {
+                    chart.clearChart();
+                    chart.draw(data, options);
+                } else {
+                    chart = new google.visualization.CandlestickChart(document.getElementById("chart_div"));
+                    chart.draw(data, options);
+                }
+            }
+
+            const chart_display = async () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const timeframe = defaultValues.timeframe !== undefined ? defaultValues.timeframe : "M15";
+                const pair = defaultValues.pair !== undefined ? defaultValues.pair.replaceAll("_", " ") : "M15";
+
+                // Send Request
+                const response = await fetch("/chartData", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        timeframe: timeframe,
+                        pair: pair,
+                    }),
+                });
+
+                const _data = await response.json();
+                google.charts.setOnLoadCallback(drawChart(_data));
+            };
+
+            // Buy n Sell
+            // ==============================================================================================
+            const buy_sell = async () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const pair = defaultValues.pair !== undefined ? defaultValues.pair.replaceAll("_", " ") : "M15";
+
+                // Send Request
+                const response = await fetch("/bid_ask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        pair: pair,
+                    }),
+                });
+
+                const _data = await response.json();
+
+                // Send
+                buyCont.innerHTML = parseFloat(_data.bid).toFixed(2) || "No data";
+                ibuy.value = parseFloat(_data.bid).toFixed(2) || "No data";
+                sellCont.innerHTML = parseFloat(_data.ask).toFixed(2) || "No data";
+                isell.value = parseFloat(_data.ask).toFixed(2) || "No data";
+                ditr.value = ((parseFloat(_data.ask) + parseFloat(_data.bid)) / 2).toFixed(2) || "No data";
+                itr.innerHTML = ((parseFloat(_data.ask) + parseFloat(_data.bid)) / 2).toFixed(2) || "No data";
+            };
+
+            // Place Buy Order
+            // ==============================================================================================
+            const buy_Order = () => {
+                fbuy.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    const lot_size = defaultValues.lot;
+                    const deviation = defaultValues.deviation;
+                    const pair = defaultValues.pair.replaceAll("_", " ");
+                    const stop_loss = defaultValues.sl;
+                    const take_profit = defaultValues.tp;
+                    const price = e.target[0].value;
+
+                    // Send Request
+                    const response = await fetch("/buy_order", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pair: pair,
+                            lot_size: lot_size,
+                            deviation: deviation,
+                            stop_loss: stop_loss,
+                            take_profit: take_profit,
+                            price: price,
+                        }),
+                    });
+
+                    // Response
+                    if ((await response).status === 200) {
+                        const _data = (await (await response).json()).message;
+                        let content_1 = "";
+
+                        // Loop
+                        for (const prop of _data["positions"]) {
+                            const item = `
+                                            <tr>
+                                                <td style="width: 16%">${prop.pair}</td>
+                                                <td style="width: 15%">${prop.ticket}</td>
+                                                <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                                                <td style="width: 7%" class="text-center">${prop.lot}</td>
+                                                <td style="width: 11%">${prop.sl}</td>
+                                                <td style="width: 11%">${prop.tp}</td>
+                                                <td style="width: 11%">${prop.op}</td>
+                                                <td style="width: 10%">${prop.cl}</td>
+                                                <td style="width: 15%">${prop.profit}</td>
+                                                <td style="width: 3%; position: relative;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                        <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                                    </svg>
+                                                    <div class="ibs" data-index=${prop.index}></div>
+                                                </td>
+                                            </tr>
+                                        `;
+                            content_1 += item;
+                        }
+
+                        tbody_1.innerHTML = content_1;
+                        close_itr();
+                    } else {
+                        const _data = await (await response).json();
+                        msg.innerHTML = _data.message;
+                        box_2.show();
+                        setTimeout(() => {
+                            box_2.hide();
+                            msg.innerHTML = "";
+                        }, 3000);
+                    }
+                });
+            };
+
+            // Place Buy Stop Order
+            // ==============================================================================================
+            const buy_stop_Order = () => {
+                fsbuy.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    const lot_size = defaultValues.lot;
+                    const deviation = defaultValues.deviation;
+                    const pair = defaultValues.pair.replaceAll("_", " ");
+                    const stop_loss = defaultValues.sl;
+                    const take_profit = defaultValues.tp;
+                    const price = e.target[0].value;
+
+                    // Send Request
+                    const response = await fetch("/buy_stop_order", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pair: pair,
+                            lot_size: lot_size,
+                            deviation: deviation,
+                            stop_loss: stop_loss,
+                            take_profit: take_profit,
+                            price: price,
+                        }),
+                    });
+
+                    // Response
+                    if ((await response).status === 200) {
+                        const _data = (await (await response).json()).message;
+                        let content_2 = "";
+
+                        // Loop
+                        for (const prop of _data["orders"]) {
+                            const item = `
+                        <tr>
+                            <td style="width: 16%">${prop.pair}</td>
+                            <td style="width: 15%">${prop.ticket}</td>
+                            <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                            <td style="width: 7%" class="text-center">${prop.lot}</td>
+                            <td style="width: 11%">${prop.sl}</td>
+                            <td style="width: 11%">${prop.tp}</td>
+                            <td style="width: 11%">${prop.op}</td>
+                            <td style="width: 10%">${prop.cl}</td>
+                            <td style="width: 15%">${prop.profit}</td>
+                            <td style="width: 3%; position: relative;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                </svg>
+                                <div class="pbs" data-ticket=${prop.ticket}></div>
+                            </td>
+                        </tr>
+                        `;
+
+                            content_2 += item;
+                        }
+
+                        tbody_2.innerHTML = content_2;
+                        close_ptr();
+                    } else {
+                        const _data = await (await response).json();
+                        msg.innerHTML = _data.message;
+                        box_2.show();
+                        setTimeout(() => {
+                            box_2.hide();
+                            msg.innerHTML = "";
+                        }, 3000);
+                    }
+                });
+            };
+
+            // Place Sell Order
+            // ==============================================================================================
+            const sell_Order = () => {
+                fsell.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    const lot_size = defaultValues.lot;
+                    const deviation = defaultValues.deviation;
+                    const pair = defaultValues.pair.replaceAll("_", " ");
+                    const stop_loss = defaultValues.sl;
+                    const take_profit = defaultValues.tp;
+                    const price = e.target[0].value;
+
+                    // Send Request
+                    const response = await fetch("/sell_order", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pair: pair,
+                            lot_size: lot_size,
+                            deviation: deviation,
+                            stop_loss: stop_loss,
+                            take_profit: take_profit,
+                            price: price,
+                        }),
+                    });
+
+                    // Response
+                    if ((await response).status === 200) {
+                        const _data = (await (await response).json()).message;
+                        let content_1 = "";
+
+                        // Loop
+                        for (const prop of _data["positions"]) {
+                            const item = `
+                                            <tr>
+                                                <td style="width: 16%">${prop.pair}</td>
+                                                <td style="width: 15%">${prop.ticket}</td>
+                                                <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                                                <td style="width: 7%" class="text-center">${prop.lot}</td>
+                                                <td style="width: 11%">${prop.sl}</td>
+                                                <td style="width: 11%">${prop.tp}</td>
+                                                <td style="width: 11%">${prop.op}</td>
+                                                <td style="width: 10%">${prop.cl}</td>
+                                                <td style="width: 15%">${prop.profit}</td>
+                                                <td style="width: 3%; position: relative;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                        <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                                    </svg>
+                                                    <div class="ibs" data-index=${prop.index}></div>
+                                                </td>
+                                            </tr>
+                                        `;
+                            content_1 += item;
+                        }
+
+                        tbody_1.innerHTML = content_1;
+                        close_itr();
+                    } else {
+                        const _data = await (await response).json();
+                        msg.innerHTML = _data.message;
+                        box_2.show();
+                        setTimeout(() => {
+                            box_2.hide();
+                            msg.innerHTML = "";
+                        }, 3000);
+                    }
+                });
+            };
+
+            // Place Double Instant Order
+            // ==============================================================================================
+            const double_instant_Order = () => {
+                fditr.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    const lot_size = defaultValues.lot;
+                    const deviation = defaultValues.deviation;
+                    const pair = defaultValues.pair.replaceAll("_", " ");
+                    const stop_loss = defaultValues.sl;
+                    const take_profit = defaultValues.tp;
+                    const price = e.target[0].value;
+
+                    // Send Request
+                    const response = await fetch("/double_instant", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pair: pair,
+                            lot_size: lot_size,
+                            deviation: deviation,
+                            stop_loss: stop_loss,
+                            take_profit: take_profit,
+                            price: price,
+                        }),
+                    });
+
+                    // Response
+                    if ((await response).status === 200) {
+                        const _data = (await (await response).json()).message;
+                        let content_1 = "";
+
+                        // Loop
+                        for (const prop of _data["positions"]) {
+                            const item = `
+                                            <tr>
+                                                <td style="width: 16%">${prop.pair}</td>
+                                                <td style="width: 15%">${prop.ticket}</td>
+                                                <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                                                <td style="width: 7%" class="text-center">${prop.lot}</td>
+                                                <td style="width: 11%">${prop.sl}</td>
+                                                <td style="width: 11%">${prop.tp}</td>
+                                                <td style="width: 11%">${prop.op}</td>
+                                                <td style="width: 10%">${prop.cl}</td>
+                                                <td style="width: 15%">${prop.profit}</td>
+                                                <td style="width: 3%; position: relative;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                        <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                                    </svg>
+                                                    <div class="ibs" data-index=${prop.index}></div>
+                                                </td>
+                                            </tr>
+                                                `;
+                            content_1 += item;
+                        }
+                        tbody_1.innerHTML = content_1;
+                        close_itr();
+                    } else {
+                        const _data = await (await response).json();
+                        msg.innerHTML = _data.message_B;
+                        box_2.show();
+                        setTimeout(() => {
+                            box_2.hide();
+                            msg.innerHTML = "";
+                        }, 3000);
+                    }
+                });
+            };
+
+            // Place Buy Stop Order
+            // ==============================================================================================
+            const sell_stop_Order = () => {
+                fssell.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    const lot_size = defaultValues.lot;
+                    const deviation = defaultValues.deviation;
+                    const pair = defaultValues.pair.replaceAll("_", " ");
+                    const stop_loss = defaultValues.sl;
+                    const take_profit = defaultValues.tp;
+                    const price = e.target[0].value;
+
+                    // Send Request
+                    const response = await fetch("/sell_stop_order", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pair: pair,
+                            lot_size: lot_size,
+                            deviation: deviation,
+                            stop_loss: stop_loss,
+                            take_profit: take_profit,
+                            price: price,
+                        }),
+                    });
+
+                    // Response
+                    if ((await response).status === 200) {
+                        const _data = (await (await response).json()).message;
+                        let content_2 = "";
+
+                        // Loop
+                        for (const prop of _data["orders"]) {
+                            const item = `
+                                            <tr>
+                                                <td style="width: 16%">${prop.pair}</td>
+                                                <td style="width: 15%">${prop.ticket}</td>
+                                                <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                                                <td style="width: 7%" class="text-center">${prop.lot}</td>
+                                                <td style="width: 11%">${prop.sl}</td>
+                                                <td style="width: 11%">${prop.tp}</td>
+                                                <td style="width: 11%">${prop.op}</td>
+                                                <td style="width: 10%">${prop.cl}</td>
+                                                <td style="width: 15%">${prop.profit}</td>
+                                                <td style="width: 3%; position: relative;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                        <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                                    </svg>
+                                                    <div class="pbs" data-ticket=${prop.ticket}></div>
+                                                </td>
+                                            </tr>
+                                        `;
+                            content_2 += item;
+                        }
+
+                        tbody_2.innerHTML = content_2;
+                        close_ptr();
+                    } else {
+                        const _data = await (await response).json();
+                        msg.innerHTML = _data.message;
+                        box_2.show();
+                        setTimeout(() => {
+                            box_2.hide();
+                            msg.innerHTML = "";
+                        }, 3000);
+                    }
+                });
+            };
+
+            // Place Double Pending Order
+            // ==============================================================================================
+            const double_pending_Order = () => {
+                fdptr.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    const lot_size = defaultValues.lot;
+                    const deviation = defaultValues.deviation;
+                    const pair = defaultValues.pair.replaceAll("_", " ");
+                    const stop_loss = defaultValues.sl;
+                    const take_profit = defaultValues.tp;
+                    const price = e.target[0].value;
+
+                    // Send Request
+                    const response = await fetch("/double_pending", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pair: pair,
+                            lot_size: lot_size,
+                            deviation: deviation,
+                            stop_loss: stop_loss,
+                            take_profit: take_profit,
+                            price: price,
+                        }),
+                    });
+
+                    // Response
+                    if ((await response).status === 200) {
+                        const _data = (await (await response).json()).message;
+                        let content_2 = "";
+
+                        // Loop
+                        for (const prop of _data["orders"]) {
+                            const item = `
+                                            <tr>
+                                                <td style="width: 16%">${prop.pair}</td>
+                                                <td style="width: 15%">${prop.ticket}</td>
+                                                <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                                                <td style="width: 7%" class="text-center">${prop.lot}</td>
+                                                <td style="width: 11%">${prop.sl}</td>
+                                                <td style="width: 11%">${prop.tp}</td>
+                                                <td style="width: 11%">${prop.op}</td>
+                                                <td style="width: 10%">${prop.cl}</td>
+                                                <td style="width: 15%">${prop.profit}</td>
+                                                <td style="width: 3%; position: relative;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                        <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                                    </svg>
+                                                    <div class="pbs" data-ticket=${prop.ticket}></div>
+                                                </td>
+                                            </tr>
+                                        `;
+                            content_2 += item;
+                        }
+
+                        tbody_2.innerHTML = content_2;
+                        close_ptr();
+                    } else {
+                        const _data = await (await response).json();
+                        msg.innerHTML = _data.message_B;
+                        box_2.show();
+                        setTimeout(() => {
+                            box_2.hide();
+                            msg.innerHTML = "";
+                        }, 3000);
+                    }
+                });
+            };
+
+            // Fetch Trades
+            // ==============================================================================================
+            const trades = async () => {
+                // Send Request
+                const response = await fetch("/trades", {
+                    method: "GET",
+                });
+
+                // Response
+                _data = await response.json();
+
+                let content_1 = "";
+                let content_2 = "";
+
+                // Loop
+                for (const prop of _data["positions"]) {
+                    const item = `
+                    <tr>
+                        <td style="width: 16%">${prop.pair}</td>
+                        <td style="width: 15%">${prop.ticket}</td>
+                        <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                        <td style="width: 7%" class="text-center">${prop.lot}</td>
+                        <td style="width: 11%">${prop.sl}</td>
+                        <td style="width: 11%">${prop.tp}</td>
+                        <td style="width: 11%">${prop.op}</td>
+                        <td style="width: 10%">${prop.cl}</td>
+                        <td style="width: 15%">${prop.profit}</td>
+                        <td style="width: 3%; position: relative;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                            </svg>
+                            <div class="ibs" data-index=${prop.index}></div>
+                        </td>
+                    </tr>
+                    `;
+                    content_1 += item;
+                }
+
+                // Loop
+                for (const prop of _data["orders"]) {
+                    const item = `
+                        <tr>
+                            <td style="width: 16%">${prop.pair}</td>
+                            <td style="width: 15%">${prop.ticket}</td>
+                            <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                            <td style="width: 7%" class="text-center">${prop.lot}</td>
+                            <td style="width: 11%">${prop.sl}</td>
+                            <td style="width: 11%">${prop.tp}</td>
+                            <td style="width: 11%">${prop.op}</td>
+                            <td style="width: 10%">${prop.cl}</td>
+                            <td style="width: 15%">${prop.profit}</td>
+                            <td style="width: 3%; position: relative;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                </svg>
+                                <div class="pbs" data-ticket=${prop.ticket}></div>
+                            </td>
+                        </tr>
+                        `;
+                    content_2 += item;
+                }
+
+                tbody_1.innerHTML = content_1;
+                tbody_2.innerHTML = content_2;
+                close_itr();
+                close_ptr();
+            };
+
+            // End Instant Trade
+            // ==============================================================================================
+            const close_itr = () => {
+                const ibs = document.querySelectorAll("div.ibs");
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const deviation = defaultValues.deviation;
+
+                ibs.forEach((each) => {
+                    each.addEventListener("click", async (e) => {
+                        const index = e.target.dataset.index;
+                        // Send Request
+                        const response = await fetch("/close_itr", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                deviation: deviation,
+                                index: index,
+                            }),
+                        });
+
+                        // Response
+                        if ((await response).status === 200) {
+                            const _data = (await (await response).json()).message;
+                            let content_1 = "";
+
+                            // Loop
+                            for (const prop of _data["positions"]) {
+                                const item = `
+                                                <tr>
+                                                    <td style="width: 16%">${prop.pair}</td>
+                                                    <td style="width: 15%">${prop.ticket}</td>
+                                                    <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                                                    <td style="width: 7%" class="text-center">${prop.lot}</td>
+                                                    <td style="width: 11%">${prop.sl}</td>
+                                                    <td style="width: 11%">${prop.tp}</td>
+                                                    <td style="width: 11%">${prop.op}</td>
+                                                    <td style="width: 10%">${prop.cl}</td>
+                                                    <td style="width: 15%">${prop.profit}</td>
+                                                    <td style="width: 3%; position: relative;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                            <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                                        </svg>
+                                                        <div class="ibs" data-index=${prop.index}></div>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                content_1 += item;
+                            }
+
+                            tbody_1.innerHTML = content_1;
+                            close_itr();
+                        } else {
+                            const _data = await (await response).json();
+                            msg.innerHTML = _data.message;
+                            box_2.show();
+                            setTimeout(() => {
+                                box_2.hide();
+                                msg.innerHTML = "";
+                            }, 3000);
+                        }
+                    });
+                });
+            };
+
+            // End Pending Trade
+            // ==============================================================================================
+            const close_ptr = () => {
+                const pbs = document.querySelectorAll("div.pbs");
+
+                pbs.forEach((each) => {
+                    each.addEventListener("click", async (e) => {
+                        const ticket = e.target.dataset.ticket;
+                        // Send Request
+                        const response = await fetch("/close_ptr", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                ticket: ticket,
+                            }),
+                        });
+
+                        // Response
+                        if ((await response).status === 200) {
+                            const _data = (await (await response).json()).message;
+                            let content_2 = "";
+
+                            // Loop
+                            for (const prop of _data["orders"]) {
+                                const item = `
+                                                <tr>
+                                                    <td style="width: 16%">${prop.pair}</td>
+                                                    <td style="width: 15%">${prop.ticket}</td>
+                                                    <td class="text-center" style="width: 7%">${prop.type.replaceAll("_", " ")}</td>
+                                                    <td style="width: 7%" class="text-center">${prop.lot}</td>
+                                                    <td style="width: 11%">${prop.sl}</td>
+                                                    <td style="width: 11%">${prop.tp}</td>
+                                                    <td style="width: 11%">${prop.op}</td>
+                                                    <td style="width: 10%">${prop.cl}</td>
+                                                    <td style="width: 15%">${prop.profit}</td>
+                                                    <td style="width: 3%; position: relative;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16">
+                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                            <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z" />
+                                                        </svg>
+                                                        <div class="pbs" data-ticket=${prop.ticket}></div>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                content_2 += item;
+                            }
+
+                            tbody_2.innerHTML = content_2;
+                            close_ptr();
+                        } else {
+                            const _data = await (await response).json();
+                            msg.innerHTML = _data.message;
+                            box_2.show();
+                            setTimeout(() => {
+                                box_2.hide();
+                                msg.innerHTML = "";
+                            }, 3000);
+                        }
+                    });
+                });
+            };
+
+            // Quit App
+            // ==============================================================================================
+            const close_app = () => {
+                quit.addEventListener("click", () => {
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    defaultValues.loggedin = false;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                    location.reload();
+                });
+            };
+
+            // Auto Trade
+            // ==============================================================================================
+            submit_atr.addEventListener("click", () => {
+                start_at.click();
+            });
+
+            fatr.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const lot = e.target[0].value;
+                const pair = e.target[1].value;
+                const ntr = e.target[2].value;
+
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                defaultValues["autoTrade"] = true;
+
+                // Save
+                localStorage.setItem("default", JSON.stringify(defaultValues));
+                submit_atr.classList.add("hide");
+                notf_atr.classList.remove("hide");
+                box_3.hide();
+
+                fetch("/auto_trade", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        lot: lot,
+                        pair: pair.replaceAll("_", " "),
+                        ntr: ntr,
+                    }),
+                });
+            });
+
+            stop_at.addEventListener("click", async () => {
+                const response = await fetch("/sta_trade", {
+                    method: "GET",
+                });
+
+                if ((await response).status === 200) {
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    defaultValues["autoTrade"] = false;
+
+                    // Save
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                    submit_atr.classList.remove("hide");
+                    notf_atr.classList.add("hide");
+                    box_3.hide();
+                }
+            });
+
+            // Load App
+            // ==============================================================================================
+            window.onload = () => {
+                if (loggedin) {
+                    setDefault();
+                    getPairs();
+                    timeframe();
+                    lot_size();
+                    stop_loss();
+                    take_profit();
+                    deviation();
+                    chart_display();
+                    buy_sell();
+                    buy_Order();
+                    buy_stop_Order();
+                    sell_Order();
+                    sell_stop_Order();
+                    double_instant_Order();
+                    double_pending_Order();
+                    trades();
+                    close_app();
+
+                    setInterval(() => {
+                        buy_sell();
+                        chart_display();
+                        trades();
+                    }, 500);
+                } else {
+                    box_l.show();
+                }
+            };
+        </script>
+    </body>
+</html>
