@@ -2,6 +2,8 @@
     "cSpell.words": [
         "activetrades",
         "actv",
+        "apsm",
+        "apstg",
         "askhigh",
         "asklow",
         "atsm",
@@ -23,6 +25,7 @@
         "fsbuy",
         "fsell",
         "fssell",
+        "fstn",
         "gridlines",
         "hloc",
         "ibuy",
@@ -42,10 +45,12 @@
         "pyplot",
         "pytz",
         "RETCODE",
+        "REUSEADDR",
         "sbuy",
         "ssell",
         "stpatr",
         "subatr",
+        "substn",
         "TIMEFRAME",
         "timeframes"
     ]

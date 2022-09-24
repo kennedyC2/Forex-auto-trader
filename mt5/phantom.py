@@ -1,13 +1,17 @@
 # Import Dependencies
+# ==============================================================================
 import MetaTrader5 as mt5
 import numpy
 from datetime import datetime
 from threading import Timer
-from time import sleep, time
+from time import sleep
+import threading
 
 
-# Class Object
-class bot:
+# ==============================================================================
+#                               Class Object
+# ==============================================================================
+class BBB:
     def __init__(self, account, password, server):
         self.Account = int(account)
         self.Password = password
@@ -22,30 +26,66 @@ class bot:
             "W1": mt5.TIMEFRAME_W1,
             "MN1": mt5.TIMEFRAME_MN1,
         }
-        self.Timeframe_list = ["M1", "M5", "M15", "M30", "H1", ]
+
+        self.Timeframe_list = [
+            "M1", "M5", "M15", "M30", "H1", "D1", "W1", "MN1"]
         self.items = {}
         self.H_H = set()
         self.L_L = set()
+
+        # Settings
+        self.pair = False
+        self.timeframe = False
+        self.lot = False
+        self.sl = False
+        self.tp = False
+        self.deviation = False
+        self.magic = 112026457
+
+        self.bot_B = {
+            "active": False,
+            "trades": 0,
+            "price": 0
+        }
+
+        self.bot_S = {
+            "active": False,
+            "trades": 0,
+            "price": 0
+        }
+
+        # RSI
+        self.rsi = 0
+        self.AvG = 0
+        self.AvL = 0
+        self.pos = 0
+        self.neg = 0
+
+        self.connection = False
         self.auto_trade = False
 
-    # Initialize MetaTrader 5
+    # Initialize MetaTrader 5 n Log Client In
     # ==========================================
-
     def Connect(self):
         if self.Account and self.Password and self.Server:
             if not mt5.initialize(path="C:/Program Files/MetaTrader 5/terminal64.exe", login=self.Account, password=self.Password, server=self.Server, timeout=60000, portable=False):
                 return {"status": False, "message": mt5.last_error()}
             else:
-                self.track_Trade()
+                # Define threads
+                t_trade = threading.Thread(target=self.track_Trade)
+
+                # Start Process
+                t_trade.start()
+
                 return {"status": True, "message": "success"}
 
-    # Get Symbols
+    # Get Symbols || Currency Pair
     # ===================================================================================
 
     def Get_Currency_Pairs(self):
         pairs = mt5.symbols_get()
 
-        # List
+        # Create List of Pairs
         data = []
         for prop in pairs:
             data.append(prop._asdict()["name"])
@@ -55,12 +95,18 @@ class bot:
     # Get currency pair information
     # ===================================================================================
 
-    def Get_Currency_Pair_Info(self, currency_pair):
-        info = mt5.symbol_info(currency_pair)
+    def Get_Currency_Pair_Info(self):
+        info = mt5.symbol_info(self.pair)
 
+        # Check If pair Is Available
         if not info.visible:
-            if not mt5.symbol_select(currency_pair, True):
-                print("Failed to add {}".format(currency_pair))
+            # Add Pair If Not Available
+            if not mt5.symbol_select(self.pair, True):
+                print("Failed to add {}".format(self.pair))
+            else:
+                self.Get_Currency_Pair_Info()
+
+        # Get Info If Pair Is Available
         else:
             data = info._asdict()
             res = {
@@ -78,13 +124,14 @@ class bot:
     # OPEN, CLOSE, HIGH, LOW
     # ===================================================================================
 
-    def HLOC(self, timeframe, pair):
+    def HLOC(self):
         data = mt5.copy_rates_from_pos(
-            pair, self.Timeframe_Dict[timeframe], 0, 60)
+            self.pair, self.Timeframe_Dict[self.timeframe], 0, 60)
 
-        array = []
+        HLOC = []
 
         for prop in data:
+            # Create Data
             arr = []
             dt = datetime.fromtimestamp(prop[0]).strftime("%Y-%m-%d, %H:%M")
             arr.append(str(dt.split(",")[1]))
@@ -93,21 +140,23 @@ class bot:
             arr.append(numpy.float64(prop[4]))
             arr.append(numpy.float64(prop[2]))
 
-            # Send
-            array.append(arr)
+            # Add To HLOC
+            HLOC.append(arr)
 
-        return array
+        return HLOC
 
     # Get active trades
     # ===================================================================================
+
     def Orders(self):
         positions = mt5.positions_get()
         orders = mt5.orders_get()
-        _data = {}
-        _data["positions"] = []
-        _data["orders"] = []
+        data = {}
+        data["positions"] = []
+        data["orders"] = []
         count = 0
 
+        # Loop [Instant Orders]
         for prop in positions:
             data = {}
             data["pair"] = prop.symbol
@@ -120,9 +169,10 @@ class bot:
             data["lot"] = prop.volume
             data["index"] = count
             data["type"] = "buy" if prop.type == 0 else "sell"
-            _data["positions"].append(data)
+            data["positions"].append(data)
             count = count + 1
 
+        # Loop [Pending Orders]
         for prop in orders:
             data = {}
             data["pair"] = prop.symbol
@@ -134,26 +184,26 @@ class bot:
             data["tp"] = prop.tp
             data["lot"] = prop.volume_current
             data["type"] = "buy_stop" if prop.type == 4 else "sell_stop"
-            _data["orders"].append(data)
+            data["orders"].append(data)
 
-        return _data
+        return data
 
     # Place Buy Order
     # ===================================================================================
 
-    def Instant_Buy_Order(self, lot_size, pair, deviation, stop_loss, take_profit, price):
-
+    def Instant_Buy_Order(self, price):
+        # Instantiate Request Object
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_BUY,
             "price": float(price),
-            "sl": float(price) - float(stop_loss),
-            "tp": float(price) + float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
-            "comment": "Hello WOrld",
+            "sl": float(price) - self.sl,
+            "tp": float(price) + self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
+            "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_FOK,
         }
@@ -170,19 +220,19 @@ class bot:
     # Place Buy_Stop Order
     # ===================================================================================
 
-    def Buy_Stop_Order(self, lot_size, pair, deviation, stop_loss, take_profit, price):
-
+    def Buy_Stop_Order(self, price):
+        # Instantiate Request Object
         request = {
             "action": mt5.TRADE_ACTION_PENDING,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_BUY_STOP,
             "price": float(price),
-            "sl": float(price) - float(stop_loss),
-            "tp": float(price) + float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
-            "comment": "Hello WOrld",
+            "sl": float(price) - self.sl,
+            "tp": float(price) + self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
+            "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_DAY,
             "type_filling": mt5.ORDER_FILLING_FOK,
         }
@@ -199,17 +249,18 @@ class bot:
     # Place Sell Order
     # ===================================================================================
 
-    def Instant_Sell_Order(self, lot_size, pair, deviation, stop_loss, take_profit, price):
+    def Instant_Sell_Order(self, price):
+        # Instantiate Request Object
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_SELL,
             "price": float(price),
-            "sl": float(price) + float(stop_loss),
-            "tp": float(price) - float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
+            "sl": float(price) + self.sl,
+            "tp": float(price) - self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
             "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_FOK,
@@ -227,18 +278,19 @@ class bot:
     # Place Sell_Stop Order
     # ===================================================================================
 
-    def Sell_Stop_Order(self, lot_size, pair, deviation, stop_loss, take_profit, price):
+    def Sell_Stop_Order(self, price):
+        # Instantiate Request Object
         request = {
             "action": mt5.TRADE_ACTION_PENDING,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_SELL_STOP,
             "price": float(price),
-            "sl": float(price) + float(stop_loss),
-            "tp": float(price) - float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
-            "comment": "Hello WOrld",
+            "sl": float(price) + self.sl,
+            "tp": float(price) - self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
+            "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_DAY,
             "type_filling": mt5.ORDER_FILLING_FOK,
         }
@@ -255,41 +307,42 @@ class bot:
     # Place Buy and Sell Order
     # ===================================================================================
 
-    def Double_Instant_Order(self, lot_size, pair, deviation, stop_loss, take_profit, price):
-
-        request_B = {
+    def Double_Instant_Order(self, price):
+        # Instantiate Request Object
+        buy_request = {
             "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_BUY,
             "price": float(price),
-            "sl": float(price) - float(stop_loss),
-            "tp": float(price) + float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
-            "comment": "Hello WOrld",
+            "sl": float(price) - self.sl,
+            "tp": float(price) + self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
+            "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_FOK,
         }
 
-        request_S = {
+        # Instantiate Request Object
+        sell_request = {
             "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_SELL,
             "price": float(price),
-            "sl": float(price) + float(stop_loss),
-            "tp": float(price) - float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
+            "sl": float(price) + self.sl,
+            "tp": float(price) - self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
             "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_FOK,
         }
 
         # Send Order
-        response_B = mt5.order_send(request_B)
-        response_S = mt5.order_send(request_S)
+        response_B = mt5.order_send(buy_request)
+        response_S = mt5.order_send(sell_request)
 
         # Validate
         if response_B.retcode != mt5.TRADE_RETCODE_DONE and response_S.retcode != mt5.TRADE_RETCODE_DONE:
@@ -300,41 +353,41 @@ class bot:
     # Place Buy-Stop and Sell-Stop Order
     # ===================================================================================
 
-    def Double_Pending_Order(self, lot_size, pair, deviation, stop_loss, take_profit, price):
+    def Double_Pending_Order(self, price):
 
-        request_B = {
+        buy_request = {
             "action": mt5.TRADE_ACTION_PENDING,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_BUY_STOP,
             "price": float(price),
-            "sl": float(price) - float(stop_loss),
-            "tp": float(price) + float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
-            "comment": "Hello WOrld",
+            "sl": float(price) - self.sl,
+            "tp": float(price) + self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
+            "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_DAY,
             "type_filling": mt5.ORDER_FILLING_FOK,
         }
 
-        request_S = {
+        sell_request = {
             "action": mt5.TRADE_ACTION_PENDING,
-            "symbol": pair,
-            "volume": float(lot_size),
+            "symbol": self.pair,
+            "volume": self.lot,
             "type": mt5.ORDER_TYPE_SELL_STOP,
             "price": float(price),
-            "sl": float(price) + float(stop_loss),
-            "tp": float(price) - float(take_profit),
-            "deviation": int(deviation),
-            "magic": 112026457,
-            "comment": "Hello WOrld",
+            "sl": float(price) + self.sl,
+            "tp": float(price) - self.tp,
+            "deviation": self.deviation,
+            "magic": self.magic,
+            "comment": "Hello World",
             "type_time": mt5.ORDER_TIME_DAY,
             "type_filling": mt5.ORDER_FILLING_FOK,
         }
 
         # Send Order
-        response_B = mt5.order_send(request_B)
-        response_S = mt5.order_send(request_S)
+        response_B = mt5.order_send(buy_request)
+        response_S = mt5.order_send(sell_request)
 
         # Validate
         if response_B.retcode != mt5.TRADE_RETCODE_DONE and response_S.retcode != mt5.TRADE_RETCODE_DONE:
@@ -345,77 +398,49 @@ class bot:
     # Close Instant Orders
     # ===================================================================================
 
-    def close_Instant_Orders(self, index, deviation):
+    def close_Instant_Order(self, index):
+        # Get Orders
         orders = mt5.positions_get()
         i = 0
 
         while i < len(orders):
             if int(index) == i:
+                # initialize variables
                 ticket = orders[i].ticket
+                symbol = orders[i].symbol
+                price = mt5.symbol_info_tick(
+                    symbol).ask if orders[i].type == 0 else mt5.symbol_info_tick(symbol).bid
+                order_type = mt5.ORDER_TYPE_SELL if orders[i].type == 0 else mt5.ORDER_TYPE_BUY
 
-                # Check if trade type is BUY
-                if orders[i].type == 0:
-                    symbol = orders[i].symbol
-                    price = mt5.symbol_info_tick(
-                        symbol).ask if orders[i].type == 0 else mt5.symbol_info_tick(symbol).bid
-                    lot = orders[i].volume
+                # Instantiate Request Object
+                request = {
+                    "action": mt5.TRADE_ACTION_DEAL,
+                    "symbol": symbol,
+                    "volume": self.lot,
+                    "type": order_type,
+                    "position": ticket,
+                    "price": price,
+                    "deviation": self.deviation,
+                    "magic": self.magic,
+                    "comment": "Hello World",
+                    "type_time": mt5.ORDER_TIME_GTC,
+                    "type_filling": mt5.ORDER_FILLING_FOK,
+                }
 
-                    request = {
-                        "action": mt5.TRADE_ACTION_DEAL,
-                        "symbol": symbol,
-                        "volume": float(lot),
-                        "type": mt5.ORDER_TYPE_SELL,
-                        "position": ticket,
-                        "price": price,
-                        "deviation": deviation,
-                        "magic": 112026457,
-                        "comment": "Hello World",
-                        "type_time": mt5.ORDER_TIME_GTC,
-                        "type_filling": mt5.ORDER_FILLING_FOK,
-                    }
+                # Send Order
+                response = mt5.order_send(request)
 
-                    # Send Order
-                    response = mt5.order_send(request)
-
-                    if response.retcode != mt5.TRADE_RETCODE_DONE:
-                        return {"status": False, "message": response.comment}
-                    else:
-                        return {"status": True, "message": self.Orders()}
-
-                # Check if trade type is SELL
-                if orders[i].type == 1:
-                    symbol = orders[i].symbol
-                    price = mt5.symbol_info_tick(
-                        symbol).ask if orders[i].type == 0 else mt5.symbol_info_tick(symbol).bid
-                    lot = orders[i].volume
-
-                    request = {
-                        "action": mt5.TRADE_ACTION_DEAL,
-                        "symbol": symbol,
-                        "volume": float(lot),
-                        "type": mt5.ORDER_TYPE_BUY,
-                        "position": ticket,
-                        "price": price,
-                        "deviation": deviation,
-                        "magic": 112026457,
-                        "comment": "Hello World",
-                        "type_time": mt5.ORDER_TIME_GTC,
-                        "type_filling": mt5.ORDER_FILLING_FOK,
-                    }
-
-                    # Send Order
-                    response = mt5.order_send(request)
-
-                    if response.retcode != mt5.TRADE_RETCODE_DONE:
-                        return {"status": False, "message": response.comment}
-                    else:
-                        return {"status": True, "message": self.Orders()}
+                if response.retcode != mt5.TRADE_RETCODE_DONE:
+                    return {"status": False, "message": response.comment}
+                else:
+                    return {"status": True, "message": self.Orders()}
 
             i = i + 1
 
     # Close Pending Orders
     # ============================================================================
-    def close_Pending_Orders(self, ticket):
+    def close_Pending_Order(self, ticket):
+        # Instantiate Request Object
         request = {
             "action": mt5.TRADE_ACTION_REMOVE,
             "order": int(ticket),
@@ -429,245 +454,306 @@ class bot:
         else:
             return {"status": True, "message": self.Orders()}
 
+    # RSI
+    # ============================================================================
+    def c_RSI(self):
+        while self.auto_trade:
+            # if not self.AvG and not self.AvL:
+            data = mt5.copy_rates_from_pos(
+                self.pair, mt5.TIMEFRAME_M15, 0, 15)
+            TG = 0
+            TL = 0
+
+            # Compute AvG and AvL
+            for i in range(len(data) - 1):
+                if data[i + 1][4] > data[i][4]:
+                    TG += data[i + 1][4] - data[i][4]
+                else:
+                    TL += data[i][4] - data[i + 1][4]
+
+            self.AvG = (TG / 14)
+            self.AvL = (TL / 14)
+
+            # RSI = 100 - (100 / (1 + (AvG / AvL)))
+            if self.AvL != 0:
+                self.rsi = round(
+                    100 - (100 / (1 + (self.AvG / self.AvL))), 2)
+            else:
+                if self.AvG != 0:
+                    self.rsi = 100
+                else:
+                    self.rsi = 50
+            print("RSI:", self.rsi)
+            # else:
+            #     data = mt5.copy_rates_from_pos(
+            #         self.pair, self.Timeframe_Dict[self.timeframe], 0, 2)
+
+            #     # New Average
+            #     if data[1][4] > data[0][4]:
+            #         self.AvG = ((self.AvG * 13) - (self.pos) +
+            #                     (data[1][4] - data[0][4])) / 14
+            #         self.AvL = self.AvL - self.neg
+            #         self.pos = data[1][4] - data[0][4]
+            #         self.neg = 0
+            #     else:
+            #         self.AvL = ((self.AvL * 13) - (self.neg) +
+            #                     (data[0][4] - data[1][4])) / 14
+            #         self.AvG = self.AvG - self.pos
+            #         self.neg = data[0][4] - data[1][4]
+            #         self.pos = 0
+
+            #     # RSI = 100 - (100 / (1 + (AvG / AvL)))
+            #     if self.AvL != 0:
+            #         self.rsi = round(
+            #             100 - (100 / (1 + (self.AvG / self.AvL))), 2)
+            #     else:
+            #         if self.AvG != 0:
+            #             self.rsi = 100
+            #         else:
+            #             self.rsi = 50
+            #     print("RSI:", self.rsi)
+
+            # Wait
+            sleep(2)
+
     # Track Trade
     # ============================================================================
+
     def track_Trade(self):
-        Timer(0.5, self.track_Trade).start()
-        positions = mt5.positions_get()
+        while True:
+            # Wait
+            sleep(0.5)
 
-        if len(positions) > 0:
-            for prop in positions:
-                if prop.ticket in self.items:
-                    if prop.profit > self.items[prop.ticket]:
-                        self.items[prop.ticket] = prop.profit
-                        print("updated ticket:", prop.ticket,
-                              "profit to", prop.profit)
-                    elif prop.profit > 0.2 and prop.profit <= (self.items[prop.ticket] - (3 * prop.volume)):
-                        print("saved profit minus current =",
-                              self.items[prop.ticket] - prop.profit)
-                        type = mt5.ORDER_TYPE_SELL if prop.type == 0 else mt5.ORDER_TYPE_BUY
-                        request = {
-                            "action": mt5.TRADE_ACTION_DEAL,
-                            "symbol": prop.symbol,
-                            "volume": float(prop.volume),
-                            "type": type,
-                            "position": prop.ticket,
-                            "price": prop.price_current,
-                            "deviation": 20,
-                            "magic": 112026457,
-                            "comment": "Hello World",
-                            "type_time": mt5.ORDER_TIME_GTC,
-                            "type_filling": mt5.ORDER_FILLING_FOK,
-                        }
+            # Get Orders
+            positions = mt5.positions_get()
 
-                        # Close Order
-                        mt5.order_send(request)
-                        del self.items[prop.ticket]
-                    elif prop.profit <= (0 - (3 * prop.volume)):
-                        type = mt5.ORDER_TYPE_SELL if prop.type == 0 else mt5.ORDER_TYPE_BUY
-                        request = {
-                            "action": mt5.TRADE_ACTION_DEAL,
-                            "symbol": prop.symbol,
-                            "volume": float(prop.volume),
-                            "type": type,
-                            "position": prop.ticket,
-                            "price": prop.price_current,
-                            "deviation": 20,
-                            "magic": 112026457,
-                            "comment": "Hello World",
-                            "type_time": mt5.ORDER_TIME_GTC,
-                            "type_filling": mt5.ORDER_FILLING_FOK,
-                        }
+            print("Tracking Trades,", "Positions:", len(positions))
 
-                        # Close Order
-                        mt5.order_send(request)
-                        del self.items[prop.ticket]
+            if len(positions) > 0:
+                for prop in positions:
+                    type = mt5.ORDER_TYPE_SELL if prop.type == 0 else mt5.ORDER_TYPE_BUY
+
+                    # Check If Order Is Already Being Tracked
+                    if prop.ticket in self.items:
+                        # Check If In Loss And If Current Loss Is 2 Pips Or Greater, Below 0.
+                        # If Requirements Meet, Close Trade.
+                        if prop.profit <= (0 - (2 * prop.volume)):
+                            # Instantiate Request Object
+                            request = {
+                                "action": mt5.TRADE_ACTION_DEAL,
+                                "symbol": prop.symbol,
+                                "volume": float(prop.volume),
+                                "type": type,
+                                "position": prop.ticket,
+                                "price": prop.price_current,
+                                "deviation": 20,
+                                "magic": self.magic,
+                                "comment": "Hello World",
+                                "type_time": mt5.ORDER_TIME_GTC,
+                                "type_filling": mt5.ORDER_FILLING_FOK,
+                            }
+
+                            # Close Order
+                            mt5.order_send(request)
+
+                        # If Current Trade Has maintained a Low Profit 5 Consecutive Times, End Trade
+                        if self.items[prop.ticket] >= 3:
+                            # Instantiate Request Object
+                            request = {
+                                "action": mt5.TRADE_ACTION_DEAL,
+                                "symbol": prop.symbol,
+                                "volume": float(prop.volume),
+                                "type": type,
+                                "position": prop.ticket,
+                                "price": prop.price_current,
+                                "deviation": 20,
+                                "magic": self.magic,
+                                "comment": "Hello World",
+                                "type_time": mt5.ORDER_TIME_GTC,
+                                "type_filling": mt5.ORDER_FILLING_FOK,
+                            }
+
+                            # Close Order
+                            mt5.order_send(request)
+                            del self.items[prop.ticket]
+
+                        # If Current Profit On Order Is Not Incrementing, Update count
+                        if prop.profit > 0 and prop.profit < (3 * prop.volume):
+                            self.items[prop.ticket] += 1
+
+                    # If Order Is Not Being Tracked
                     else:
-                        pass
-                else:
-                    if prop.profit <= (0 - (3 * prop.volume)):
-                        type = mt5.ORDER_TYPE_SELL if prop.type == 0 else mt5.ORDER_TYPE_BUY
-                        request = {
-                            "action": mt5.TRADE_ACTION_DEAL,
-                            "symbol": prop.symbol,
-                            "volume": float(prop.volume),
-                            "type": type,
-                            "position": prop.ticket,
-                            "price": prop.price_current,
-                            "deviation": 20,
-                            "magic": 112026457,
-                            "comment": "Hello World",
-                            "type_time": mt5.ORDER_TIME_GTC,
-                            "type_filling": mt5.ORDER_FILLING_FOK,
-                        }
+                        # Check If In Loss And If Current Loss Is 2 Pips Or Greater, Below 0.
+                        # If Requirements Meet, Close Trade.
+                        if prop.profit <= (0 - (2 * prop.volume)):
+                            type = mt5.ORDER_TYPE_SELL if prop.type == 0 else mt5.ORDER_TYPE_BUY
 
-                        # Close Order
-                        mt5.order_send(request)
-                    elif prop.profit > (2 * prop.volume):
-                        self.items[prop.ticket] = prop.profit
-                    else:
-                        pass
+                            # Instantiate Request Object
+                            request = {
+                                "action": mt5.TRADE_ACTION_DEAL,
+                                "symbol": prop.symbol,
+                                "volume": float(prop.volume),
+                                "type": type,
+                                "position": prop.ticket,
+                                "price": prop.price_current,
+                                "deviation": 20,
+                                "magic": self.magic,
+                                "comment": "Hello World",
+                                "type_time": mt5.ORDER_TIME_GTC,
+                                "type_filling": mt5.ORDER_FILLING_FOK,
+                            }
 
-    # Fetcher
+                            # Close Order
+                            mt5.order_send(request)
+
+                        # Check If Current Profit Is Above 2 Pips,
+                        # Add To Tracked Orders
+                        elif prop.profit > (2 * prop.volume):
+                            self.items[prop.ticket] = 1
+
+    # Fetch return Prices
     # ============================================================================
-    def fetcher(self, pair):
-        timestamp = ["M1", "M15", "M30", "H1"]
-        candles = [2880, 192, 96, 48]
+    def fetcher(self, candles):
+        # Fetch Candles
+        data = mt5.copy_rates_from_pos(
+            self.pair, self.Timeframe_Dict[self.timeframe], 1, candles + 6)
 
-        for e in range(4):
-            data = mt5.copy_rates_from_pos(
-                pair, self.Timeframe_Dict[timestamp[e]], 1, candles[e] + 6)
+        # Filter returning Highs
+        for i in range(len(data)):
+            counter_1 = 0
+            counter_2 = 0
 
-            for i in range(len(data)):
-                count = 0
-                if (i <= len(data) - 6):
-                    for j in range(1, 6):
-                        if data[i][2] - data[i + j][2] >= 0.5 and data[i + j][4] < data[i + j][1]:
-                            count = count + 1
+            # Get Downtrend return Prices:
+            # Check If Current Candle High Is Greater Than Next Candle High
+            # Check If Next Candle closing Price Is Less Than Its Opening Price
+            if (i <= len(data) - 6):
+                for j in range(1, 6):
+                    if data[i + j - 1][4] > data[i + j][4]:
+                        counter_1 += 1
 
-                        if count >= 4:
-                            self.H_H.add(data[i][2])
+                if counter_1 >= 4:
+                    self.H_H.add(data[i][2])
                 else:
-                    break
-
-            for i in range(1, len(data)):
-                count = 0
-                if (i <= len(data) - 6):
                     for j in range(1, 6):
-                        if data[i + j][3] - data[i][3] >= 0.5 and data[i + j][4] > data[i + j][1]:
-                            count = count + 1
+                        if data[i + j - 1][4] < data[i + j][4]:
+                            counter_2 += 1
 
-                    if count >= 5:
+                    if counter_2 >= 4:
                         self.L_L.add(data[i][3])
-                else:
-                    break
+            else:
+                break
 
     # Auto Trader 1
     # ============================================================================
 
-    def auto_T1(self, currency_pair, lot, no_of_trades):
-        orders = mt5.positions_get()
-        existing = set()
+    def auto_T1(self, price, no_of_trades):
+        # Update Status
+        self.bot_B["active"] = True
 
-        for i in range(5, 0, -1):
-            for prop in orders:
-                existing.add(float(prop.price_open) + float(i/10))
+        print("BOT_B")
 
-        if len(self.H_H) > 0 and len(orders) <= int(no_of_trades):
-            info = (mt5.symbol_info(currency_pair))._asdict()
+        # Initialize
+        while self.bot_B["trades"] < int(no_of_trades) / 2:
+            # Get Current Tick Info
+            info = (mt5.symbol_info(self.pair))._asdict()
 
-            for i in range(5, 0, -1):
-                if info["bid"] + (i/10) in self.H_H and info["bid"] + (i/10) not in existing:
-                    request_B = {
-                        "action": mt5.TRADE_ACTION_DEAL,
-                        "symbol": currency_pair,
-                        "volume": float(lot),
-                        "type": mt5.ORDER_TYPE_BUY,
-                        "price": float(info["bid"] + (i/10)),
-                        "sl": float(info["bid"] + (i/10)) - float(10),
-                        "tp": float(info["bid"] + (i/10)) + float(10),
-                        "deviation": int(20),
-                        "magic": 112026457,
-                        "comment": "Hello WOrld",
-                        "type_time": mt5.ORDER_TIME_GTC,
-                        "type_filling": mt5.ORDER_FILLING_FOK,
-                    }
+            # Check If Current Price Is Either 5 pips below or 5 pips above
+            if info["ask"] - price <= 0.5 or price - info["ask"] <= 0.5:
+                self.Instant_Sell_Order(
+                    self.lot, self.pair, self.deviation, self.sl, self.tp, info["ask"])
 
-                    request_S = {
-                        "action": mt5.TRADE_ACTION_DEAL,
-                        "symbol": currency_pair,
-                        "volume": float(lot),
-                        "type": mt5.ORDER_TYPE_SELL,
-                        "price": float(info["bid"] + (i/10)),
-                        "sl": float(info["bid"] + (i/10)) + float(10),
-                        "tp": float(info["bid"] + (i/10)) - float(10),
-                        "deviation": int(20),
-                        "magic": 112026457,
-                        "comment": "Hello World",
-                        "type_time": mt5.ORDER_TIME_GTC,
-                        "type_filling": mt5.ORDER_FILLING_FOK,
-                    }
+                self.bot_B["price"] = info["ask"]
 
-                    # Send Order
-                    response_B = mt5.order_send(request_B)
-                    response_S = mt5.order_send(request_S)
-                    print(response_B.comment)
-                    print(response_S.comment)
+                # Wait
+                sleep(10)
 
-                    # Validate
-                    if response_B.retcode != mt5.TRADE_RETCODE_DONE and response_S.retcode != mt5.TRADE_RETCODE_DONE:
-                        print("message_Buy", response_B.comment,
-                              "message_Sell", response_S.comment)
+                # Update Status
+                self.bot_B["active"] = False
+
+                # Return
+                return
+
+            # Wait
+            sleep(10)
 
     # Auto Trader 2
     # ============================================================================
 
-    def auto_T2(self, currency_pair, lot, no_of_trades):
-        orders = mt5.positions_get()
-        existing = set()
+    def auto_T2(self, price, no_of_trades):
+        # Update Status
+        self.bot_S["active"] = True
 
-        for i in range(5, 0, -1):
-            for prop in orders:
-                existing.add(float(prop.price_open) - float(i/10))
+        print("BOT_S")
 
-        if len(self.L_L) > 0 and len(orders) <= int(no_of_trades):
-            info = (mt5.symbol_info(currency_pair))._asdict()
+        # Initialize
+        while self.bot_S["trades"] < int(no_of_trades) / 2:
+            # Get Current Tick Info
+            info = (mt5.symbol_info(self.pair))._asdict()
 
-            for i in range(5, 0, -1):
-                if info["ask"] - (i/10) in self.L_L and info["bid"] + (i/10) not in existing:
-                    request_B = {
-                        "action": mt5.TRADE_ACTION_DEAL,
-                        "symbol": currency_pair,
-                        "volume": float(lot),
-                        "type": mt5.ORDER_TYPE_BUY,
-                        "price": float(info["ask"] - (i/10)),
-                        "sl": float(info["ask"] - (i/10)) - float(10),
-                        "tp": float(info["ask"] - (i/10)) + float(10),
-                        "deviation": int(20),
-                        "magic": 112026457,
-                        "comment": "Hello WOrld",
-                        "type_time": mt5.ORDER_TIME_GTC,
-                        "type_filling": mt5.ORDER_FILLING_FOK,
-                    }
+            # Check If Current Price Is Either 5 pips below or 5 pips above
+            if info["bid"] - price <= 0.5 or price - info["bid"] <= 0.5:
+                self.Instant_Buy_Order(
+                    self.lot, self.pair, self.deviation, self.sl, self.tp, info["bid"])
 
-                    request_S = {
-                        "action": mt5.TRADE_ACTION_DEAL,
-                        "symbol": currency_pair,
-                        "volume": float(lot),
-                        "type": mt5.ORDER_TYPE_SELL,
-                        "price": float(info["ask"] - (i/10)),
-                        "sl": float(info["ask"] - (i/10)) + float(10),
-                        "tp": float(info["ask"] - (i/10)) - float(10),
-                        "deviation": int(20),
-                        "magic": 112026457,
-                        "comment": "Hello World",
-                        "type_time": mt5.ORDER_TIME_GTC,
-                        "type_filling": mt5.ORDER_FILLING_FOK,
-                    }
+                self.bot_S["price"] = info["bid"]
 
-                    # Send Order
-                    response_B = mt5.order_send(request_B)
-                    response_S = mt5.order_send(request_S)
-                    print(response_B.comment)
-                    print(response_S.comment)
+                # Wait
+                sleep(10)
 
-                    # Validate
-                    if response_B.retcode != mt5.TRADE_RETCODE_DONE and response_S.retcode != mt5.TRADE_RETCODE_DONE:
-                        print("message_Buy", response_B.comment,
-                              "message_Sell", response_S.comment)
+                # Update Status
+                self.bot_S["active"] = False
+
+                # Return
+                return
+
+            # Wait
+            sleep(10)
 
     # Start Auto Trading
     # ============================================================================
 
-    def start_auto(self, currency_pair, lot, no_of_trades):
+    def start_auto(self, no_of_trades, candles):
         # Populate Prices
-        self.fetcher(currency_pair)
+        self.fetcher(candles)
+
+        # Get Existing Orders
+        orders = mt5.positions_get()
+
+        # RSI Thread
+        s_RSI = threading.Thread(target=self.c_RSI)
+
+        # Start RSI Thread
+        s_RSI.start()
+
+        if len(orders) > 0:
+            # Update Counter
+            for prop in orders:
+                if prop.type == 0:
+                    self.bot_B["trades"] += 1
+                else:
+                    self.bot_S["trades"] += 1
 
         while self.auto_trade:
-            # Start HP Monitor
-            self.auto_T1(currency_pair, lot, no_of_trades)
+            # print(self.rsi)
+            # Check RSI
+            # if len(self.rsi) > 0:
+            #     # Get Current Tick Info
+            #     info = (mt5.symbol_info(self.pair))._asdict()
 
-            # Start LP Monitor
-            self.auto_T2(currency_pair, lot, no_of_trades)
+            #     # Check If Database Has Been Updated And Number Of Existing Orders Are Not Greater Than Required
+            #     if len(self.H_H) > 0 and len(self.L_L) > 0:
+            #         # Start HP Monitor
+            #         if info["ask"] in self.H_H and self.bot_B["trades"] < int(no_of_trades) / 2 and not self.bot_B["active"]:
+            #             if info["ask"] - self.bot_B["price"] > 0.3 and round(float(self.lvl[0]), 1) >= 65:
+            #                 self.auto_T1(info["ask"], no_of_trades)
 
-            sleep(2)
+            #         # Wait
+            #         sleep(5)
+
+            #         # Start LP Monitor
+            #         if info["bid"] in self.L_L and self.bot_S["trades"] < int(no_of_trades) / 2 and not self.bot_S["active"]:
+            #             if self.bot_S["price"] - info["bid"] > 0.3 and round(float(self.lvl[0]), 1) <= 35:
+            #                 self.auto_T2(info["bid"], no_of_trades)
+
+            # Wait
+            sleep(5)

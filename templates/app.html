@@ -5,7 +5,6 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <title>PHANTOM</title>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700;800;900&display=swap");
@@ -18,7 +17,7 @@
                 -moz-osx-font-smoothing: grayscale;
                 scrollbar-width: thin;
                 scrollbar-color: #2c7ce558 #e3ebf6;
-                background-color: #f5f5f5;
+                background-color: #000000;
             }
 
             div,
@@ -75,7 +74,107 @@
                 display: none;
             }
 
-            @media screen and (min-width: 992px) {
+            body > div {
+                display: block;
+                overflow: hidden;
+                height: 100vh;
+                margin: 0;
+            }
+
+            .modal-dialog {
+                width: 90%;
+                margin: auto;
+            }
+
+            .modal-dialog label {
+                padding-left: 0.2rem;
+                font-size: 0.8rem;
+                color: #202a44 !important;
+            }
+
+            .modal-dialog > div {
+                background-color: #ffffff;
+            }
+
+            .icon {
+                display: none;
+            }
+
+            .icon-2 {
+                display: none;
+            }
+
+            .content-div {
+                background-color: #ffffff;
+                box-shadow: 0px 1px 10px rgb(0 0 0 / 20%);
+            }
+
+            .right-container {
+                background-color: #ffffff;
+                box-shadow: 0px 1px 10px rgb(0 0 0 / 20%);
+                width: 100%;
+            }
+
+            .right-container > div:nth-child(1),
+            .right-container > div:nth-child(2),
+            .right-container > div:nth-child(3) {
+                height: 20%;
+                margin-bottom: 1.5rem;
+            }
+
+            .A > div:first-child > div {
+                width: calc((100% / 4) - 2rem);
+                height: 100%;
+            }
+
+            .form-control,
+            .input-group-text,
+            .form-select {
+                font-size: 0.75rem;
+            }
+
+            p {
+                font-size: 1rem;
+                text-decoration: underline;
+            }
+
+            .right-container .form-control {
+                font-size: 1.5rem;
+                padding: 0 0.75rem;
+                border: 0;
+            }
+
+            .nav {
+                transform: rotate(-90deg);
+                position: absolute;
+                left: 20px;
+                bottom: 0;
+                width: 0;
+                height: 12%;
+                flex-wrap: nowrap;
+            }
+
+            .nav-link {
+                padding-top: 0.1rem;
+                padding-bottom: 0.1rem;
+                height: 1.3rem;
+                color: #202a44 !important;
+                border-radius: 0 !important;
+            }
+
+            .nav-link.active {
+                color: #202a44 !important;
+                background-color: #e9ecef !important;
+                border-radius: 0 !important;
+            }
+
+            @media screen and (min-width: 768px) {
+                .right-container {
+                    display: none;
+                }
+            }
+
+            @media screen and (min-width: 1200px) {
                 body > div {
                     display: grid;
                     overflow: hidden;
@@ -86,25 +185,7 @@
                 }
 
                 .modal-dialog {
-                    width: 420px;
-                }
-
-                .modal-dialog label {
-                    padding-left: 0.2rem;
-                    font-size: 0.8rem;
-                    color: #202a44 !important;
-                }
-
-                .modal-dialog > div {
-                    background-color: #ffffff;
-                }
-
-                .icon {
-                    display: none;
-                }
-
-                .icon-2 {
-                    display: none;
+                    width: 320px;
                 }
 
                 .left-container {
@@ -113,64 +194,16 @@
                     grid-gap: 2%;
                 }
 
-                .content-div {
-                    background-color: #ffffff;
-                    box-shadow: 0px 1px 10px rgb(0 0 0 / 20%);
-                }
-
                 .right-container {
-                    background-color: #ffffff;
-                    box-shadow: 0px 1px 10px rgb(0 0 0 / 20%);
+                    display: block;
+                    width: 25%;
                 }
 
-                .right-container > div:nth-child(1) > div {
-                    width: 45%;
-                }
-
-                .A > div:first-child > div {
-                    width: calc((100% / 4) - 2rem);
-                    height: 100%;
-                }
-
-                .form-control,
-                .input-group-text,
-                .form-select {
-                    font-size: 0.7rem;
-                }
-
-                p {
-                    font-size: 0.9rem;
-                    text-decoration: underline;
-                }
-
-                .right-container .form-control {
-                    font-size: 1.5rem;
-                    padding: 0 0.75rem;
-                    border: 0;
-                }
-
-                .nav {
-                    transform: rotate(-90deg);
-                    position: absolute;
-                    left: 20px;
-                    bottom: 0;
-                    width: 0;
-                    height: 12%;
-                    flex-wrap: nowrap;
-                }
-
-                .nav-link {
-                    padding-top: 0.1rem;
-                    padding-bottom: 0.1rem;
-                    height: 1.3rem;
-                    color: #202a44 !important;
-                    border-radius: 0 !important;
-                }
-
-                .nav-link.active {
-                    color: #202a44 !important;
-                    background-color: #e9ecef !important;
-                    border-radius: 0 !important;
+                .right-container > div:nth-child(1),
+                .right-container > div:nth-child(2),
+                .right-container > div:nth-child(3) {
+                    min-height: 4.3rem;
+                    margin-bottom: 2rem;
                 }
 
                 table {
@@ -209,101 +242,10 @@
     </head>
 
     <body>
-        <div class="container-fluid py-2 vw-100 vh-100 d-none d-lg-grid">
-            <div class="left-container h-100">
-                <div class="content-div A px-3 py-2">
-                    <div class="d-flex justify-content-between">
-                        <div class="input-group" style="width: calc((100% / 4))">
-                            <span class="input-group-text">Pairs</span>
-                            <select class="form-select form-select-sm" id="c_pairs" aria-label=".form-select-sm" value="Step Index"></select>
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text">Timeframe</span>
-                            <select class="form-select form-select-sm" id="timeframe" aria-label=".form-select-sm" value="M15"></select>
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text">Lot</span>
-                            <input type="number" class="form-control form-control-sm" id="lot" placeholder="0.10" />
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text">Deviation</span>
-                            <input type="number" class="form-control form-control-sm" id="deviation" placeholder="20" />
-                        </div>
-                    </div>
-                    <div id="chart_div" class="pt-3" style="height: calc(100% - 2rem); width: auto"></div>
-                </div>
-                <div class="content-div B py-2 px-3 position-relative" style="font-size: 0.7rem">
-                    <div class="d-flex align-items-start justify-content-end h-100">
-                        <div class="nav nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical" style="transform: rotate(-90deg)">
-                            <button class="nav-link active" id="v-pills-activetrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-activetrades" type="button" role="tab" aria-controls="v-pills-activetrades" aria-selected="true">ACTIVE</button>
-                            <button class="nav-link" id="v-pills-pendingtrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pendingtrades" type="button" role="tab" aria-controls="v-pills-pendingtrades" aria-selected="false">PENDING</button>
-                        </div>
-                        <div class="tab-content h-100" id="v-pills-tabContent" style="width: 98%">
-                            <div class="tab-pane h-100 fade show active" id="v-pills-activetrades" role="tabpanel" aria-labelledby="v-pills-activetrades-tab">
-                                <table class="table table-sm table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" style="width: 16%">Symbol</th>
-                                            <th scope="col" style="width: 15%">Ticket</th>
-                                            <th scope="col" style="width: 7%">Type</th>
-                                            <th scope="col" style="width: 7%" class="text-center">Lot</th>
-                                            <th scope="col" style="width: 11%">Stop Loss</th>
-                                            <th scope="col" style="width: 11%">Take Profit</th>
-                                            <th scope="col" style="width: 11%">Entry</th>
-                                            <th scope="col" style="width: 10%">Current</th>
-                                            <th scope="col" style="width: 15%">Profit</th>
-                                            <th scope="col" style="width: 3%">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
-                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
-                                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
-                                                </svg>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="actv"></tbody>
-                                </table>
-                            </div>
-                            <div class="tab-pane h-100 fade" id="v-pills-pendingtrades" role="tabpanel" aria-labelledby="v-pills-pendingtrades-tab">
-                                <table class="table table-sm table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" style="width: 16%">Symbol</th>
-                                            <th scope="col" style="width: 15%">Ticket</th>
-                                            <th scope="col" style="width: 7%">Type</th>
-                                            <th scope="col" style="width: 7%" class="text-center">Lot</th>
-                                            <th scope="col" style="width: 11%">Stop Loss</th>
-                                            <th scope="col" style="width: 11%">Take Profit</th>
-                                            <th scope="col" style="width: 11%">Entry</th>
-                                            <th scope="col" style="width: 10%">Current</th>
-                                            <th scope="col" style="width: 15%">Profit</th>
-                                            <th scope="col" style="width: 3%">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
-                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
-                                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
-                                                </svg>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="pndn"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="container-fluid p-0 w-100 h-100 d-flex align-content-center justify-content-center">
+            <!-- Removed Left Bar -->
             <div class="right-container h-100 px-3 py-3 position-relative" id="right-container">
-                <div class="d-flex justify-content-between" style="margin-bottom: 2rem">
-                    <div class="text-center" style="width: 47%">
-                        <label for="stop_loss" class="form-label mb-1" style="font-size: 13px">Stop Loss:</label>
-                        <input type="number" class="form-control text-center" id="stop_loss" placeholder="0.5" step="0.5" />
-                    </div>
-                    <div class="text-center" style="width: 47%">
-                        <label for="take_profit" class="form-label mb-1" style="font-size: 13px">Take Profit:</label>
-                        <input type="number" class="form-control text-center" id="take_profit" placeholder="100" step="20" />
-                    </div>
-                </div>
-
-                <div style="min-height: 4.3rem; margin-bottom: 2rem">
+                <div class="mt-5">
                     <p class="text-center">Instant Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
@@ -323,7 +265,7 @@
                     </div>
                 </div>
 
-                <div style="min-height: 4.3rem; margin-bottom: 2rem">
+                <div>
                     <p class="text-center">Delayed Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
@@ -341,7 +283,7 @@
                     </div>
                 </div>
 
-                <div style="min-height: 4.3rem; margin-bottom: 2rem">
+                <div>
                     <p class="text-center">Double Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
@@ -359,91 +301,149 @@
                         </div>
                     </div>
                 </div>
-                <!--  -->
-
-                <div class="position-absolute" style="bottom: 10px; width: 90%">
+                <div class="position-absolute" style="bottom: 10px; width: 91%">
                     <button type="button" class="btn btn-sm w-100 btn-success" data-bs-toggle="modal" data-bs-target="#autoTr">Auto Trade</button>
                     <button class="btn btn-sm btn-danger w-100 quit mt-2">Quit</button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Login Modal -->
-        <div class="modal fade" id="login" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <div class="border py-2 px-3 w-100">
-                            <h5 class="text-uppercase text-center my-2 text-danger"><span class="text-success">Wel</span>come</h5>
-                            <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p>
-                            <form action="#" id="lgn" method="post">
-                                <div class="mb-3">
-                                    <label for="account" class="form-label">Account:</label>
-                                    <input type="text" class="form-control" id="account" placeholder="20254407" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password:</label>
-                                    <input type="password" class="form-control" id="password" placeholder="************" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label for="server" class="form-label">Server:</label>
-                                    <input type="text" class="form-control" id="server" placeholder="server" required />
-                                </div>
-                                <div class="mb-2 mt-4 text-end">
-                                    <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100" id="bt1">Continue</button>
-                                    <button type="button" class="btn btn-sm btn-dark px-4 w-100 hide" id="bt2" disabled>
-                                        <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
-                                        Please Wait...
-                                    </button>
-                                </div>
-                            </form>
+                <button type="button" class="position-absolute btn btn-lg" style="top: 5px; right: 0" data-bs-toggle="modal" data-bs-target="#settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="stn" aria-hidden="true" role="img" width="30px" height="30px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+                        <path
+                            fill="currentColor"
+                            d="M12.94 22h-1.89a1.68 1.68 0 0 1-1.68-1.68v-1.09a.34.34 0 0 0-.22-.29a.38.38 0 0 0-.41 0l-.74.8a1.67 1.67 0 0 1-2.37 0L4.26 18.4a1.66 1.66 0 0 1-.5-1.19a1.72 1.72 0 0 1 .5-1.21l.74-.74a.34.34 0 0 0 0-.37c-.06-.15-.16-.26-.3-.26H3.68A1.69 1.69 0 0 1 2 12.94v-1.89a1.68 1.68 0 0 1 1.68-1.68h1.09a.34.34 0 0 0 .29-.22a.38.38 0 0 0 0-.41L4.26 8a1.67 1.67 0 0 1 0-2.37L5.6 4.26a1.65 1.65 0 0 1 1.18-.5a1.72 1.72 0 0 1 1.22.5l.74.74a.34.34 0 0 0 .37 0c.15-.06.26-.16.26-.3V3.68A1.69 1.69 0 0 1 11.06 2H13a1.68 1.68 0 0 1 1.68 1.68v1.09a.34.34 0 0 0 .22.29a.38.38 0 0 0 .41 0l.69-.8a1.67 1.67 0 0 1 2.37 0l1.37 1.34a1.67 1.67 0 0 1 .5 1.19a1.63 1.63 0 0 1-.5 1.21l-.74.74a.34.34 0 0 0 0 .37c.06.15.16.26.3.26h1.09A1.69 1.69 0 0 1 22 11.06V13a1.68 1.68 0 0 1-1.68 1.68h-1.09a.34.34 0 0 0-.29.22a.34.34 0 0 0 0 .37l.77.77a1.67 1.67 0 0 1 0 2.37l-1.31 1.33a1.65 1.65 0 0 1-1.18.5a1.72 1.72 0 0 1-1.19-.5l-.77-.74a.34.34 0 0 0-.37 0c-.15.06-.26.16-.26.3v1.09A1.69 1.69 0 0 1 12.94 22Zm-1.57-2h1.26v-.77a2.33 2.33 0 0 1 1.46-2.14a2.36 2.36 0 0 1 2.59.47l.54.54l.88-.88l-.54-.55a2.34 2.34 0 0 1-.48-2.56a2.33 2.33 0 0 1 2.14-1.45H20v-1.29h-.77a2.33 2.33 0 0 1-2.14-1.46a2.36 2.36 0 0 1 .47-2.59l.54-.54l-.88-.88l-.55.54a2.39 2.39 0 0 1-4-1.67V4h-1.3v.77a2.33 2.33 0 0 1-1.46 2.14a2.36 2.36 0 0 1-2.59-.47l-.54-.54l-.88.88l.54.55a2.39 2.39 0 0 1-1.67 4H4v1.26h.77a2.33 2.33 0 0 1 2.14 1.46a2.36 2.36 0 0 1-.47 2.59l-.54.54l.88.88l.55-.54a2.39 2.39 0 0 1 4 1.67Z"
+                        />
+                        <path fill="currentColor" d="M12 15.5a3.5 3.5 0 1 1 3.5-3.5a3.5 3.5 0 0 1-3.5 3.5Zm0-5a1.5 1.5 0 1 0 1.5 1.5a1.5 1.5 0 0 0-1.5-1.5Z" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Login Modal -->
+            <div class="modal fade" id="login" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="w-100">
+                                <h5 class="text-uppercase text-center my-2 text-danger"><span class="text-success">Wel</span>come</h5>
+                                <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p>
+                                <form action="#" id="lgn" method="post">
+                                    <div class="mb-3">
+                                        <label for="account" class="form-label">Account:</label>
+                                        <input type="text" class="form-control" id="account" placeholder="20254407" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Password:</label>
+                                        <input type="password" class="form-control" id="password" placeholder="************" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="server" class="form-label">Server:</label>
+                                        <input type="text" class="form-control" id="server" placeholder="server" required />
+                                    </div>
+                                    <div class="mb-2 mt-4 text-end">
+                                        <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100" id="bt1">Continue</button>
+                                        <button type="button" class="btn btn-sm btn-dark px-4 w-100 hide" id="bt2" disabled>
+                                            <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
+                                            Please Wait...
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Notif Modal -->
-        <div class="modal fade" id="Notif" tabindex="-1" aria-labelledby="NotifLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body msg text-capitalize text-center p-2 text-danger"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Auto Trader Modal -->
-        <div class="modal fade" id="autoTr" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <div class="border py-2 px-3 w-100">
-                            <h5 class="text-uppercase text-center my-2 text-danger"><span class="text-success">Auto</span>Trading</h5>
-                            <!-- <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p> -->
-                            <form action="#" id="atr" method="post">
-                                <div class="mb-3">
-                                    <label for="atr_lot" class="form-label">Lot:</label>
-                                    <input type="number" class="form-control" id="atr_lot" placeholder="0.0" min="0.1" step="any" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label for="atr_pairs" class="form-label">Pair:</label>
-                                    <select class="form-select form-select-sm" id="atr_pairs" aria-label=".form-select-sm" value="Step Index"></select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="atr_ntr" class="form-label">No of Trades per Time (min 2):</label>
-                                    <input type="number" class="form-control" id="atr_ntr" placeholder="2" min="2" step="2" required />
-                                </div>
-                                <div class="mb-3 hide">
-                                    <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100 atsm" ss>Continue</button>
-                                </div>
-                            </form>
+            <!-- Settings Modal -->
+            <div class="modal fade" id="settings" tabindex="-1" aria-labelledby="settingsLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="w-100">
+                                <h5 class="text-uppercase text-center my-2 text-danger">Settings</h5>
+                                <form action="#" id="apstg" method="post">
+                                    <div class="mb-3">
+                                        <label for="c_pairs" class="form-label">Pairs:</label>
+                                        <select class="form-select form-select-lg" id="c_pairs" aria-label=".form-select-lg" value="Step Index"></select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="timeframe" class="form-label">Timeframe:</label>
+                                        <select class="form-select form-select-lg" id="timeframe" aria-label=".form-select-lg" value="M15"></select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="lot" class="form-label">Lot:</label>
+                                        <input type="number" class="form-control form-control-sm" id="lot" placeholder="0.10" step="any" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="stop_loss" class="form-label">Stop Loss:</label>
+                                        <input type="number" class="form-control form-control-sm" id="stop_loss" placeholder="0.5" step="0.5" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="take_profit" class="form-label">Take Profit:</label>
+                                        <input type="number" class="form-control form-control-sm" id="take_profit" placeholder="100" step="10" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="deviation" class="form-label">Deviation:</label>
+                                        <input type="number" class="form-control form-control-sm" id="deviation" placeholder="20" />
+                                    </div>
+                                    <div class="mb-3 hide">
+                                        <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100 apsm">Continue</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-sm btn-success substn px-4">Save</button>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-sm btn-danger stpatr">Stop</button>
-                        <button type="button" class="btn btn-sm btn-success subatr">Start</button>
-                        <button type="button" class="btn btn-sm btn-success ntatr hide" disabled>Running</button>
+                </div>
+            </div>
+
+            <!-- Notif Modal -->
+            <div class="modal fade" id="Notif" tabindex="-1" aria-labelledby="NotifLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body msg text-capitalize text-center p-2 text-danger"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto Trader Modal -->
+            <div class="modal fade" id="autoTr" tabindex="-1" aria-labelledby="autoTLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="w-100">
+                                <h5 class="text-uppercase text-center my-2 text-danger"><span class="text-success">Auto</span>Trading</h5>
+                                <!-- <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p> -->
+                                <form action="#" id="atr" method="post">
+                                    <div class="mb-3">
+                                        <label for="atr_lot" class="form-label">Lot:</label>
+                                        <input type="number" class="form-control" id="atr_lot" placeholder="0.0" min="0.1" step="any" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="atr_pairs" class="form-label">Pair:</label>
+                                        <select class="form-select form-select-lg" id="atr_pairs" aria-label=".form-select-lg" value="Step Index"></select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="atr_tmp" class="form-label">Timeframe:</label>
+                                        <select class="form-select form-select-lg" id="atr_tmp" aria-label=".form-select-lg" value="M15"></select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="atr_ntr" class="form-label">Trades (min: 2):</label>
+                                        <input type="number" class="form-control" id="atr_ntr" placeholder="2" min="2" step="2" required />
+                                    </div>
+                                    <div class="mb-3 hide">
+                                        <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100 atsm">Continue</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-sm btn-danger stpatr px-4">Stop</button>
+                            <button type="button" class="btn btn-sm btn-success subatr px-4">Start</button>
+                            <button type="button" class="btn btn-sm btn-success ntatr px-2 hide" disabled>Running</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -458,6 +458,7 @@
             const c_pairs = document.getElementById("c_pairs");
             const atr_pairs = document.getElementById("atr_pairs");
             const timeframes = document.getElementById("timeframe");
+            const timeframes_0 = document.getElementById("atr_tmp");
             const lot = document.getElementById("lot");
             const atr_lot = document.getElementById("atr_lot");
             const atr_ntr = document.getElementById("atr_ntr");
@@ -476,10 +477,13 @@
             const fssell = document.querySelector("form#fssell");
             const fditr = document.querySelector("form#fditr");
             const fdptr = document.querySelector("form#fdptr");
+            const fstn = document.querySelector("form#apstg");
             const tbody_1 = document.getElementById("actv");
             const tbody_2 = document.getElementById("pndn");
             const quit = document.querySelector("button.quit");
             const start_at = document.querySelector("button.atsm");
+            const save_stn = document.querySelector("button.apsm");
+            const submit_stn = document.querySelector("button.substn");
             const stop_at = document.querySelector("button.stpatr");
             const submit_atr = document.querySelector("button.subatr");
             const notf_atr = document.querySelector("button.ntatr");
@@ -488,13 +492,25 @@
             const notifdd = document.querySelector("p.notifdd");
             const bt1 = document.getElementById("bt1");
             const bt2 = document.getElementById("bt2");
+            const stn = document.getElementById("stn");
             const box_l = new bootstrap.Modal(document.getElementById("login"), { backdrop: "static" });
             const box_2 = new bootstrap.Modal(document.getElementById("Notif"), {});
             const box_3 = new bootstrap.Modal(document.getElementById("autoTr"), { backdrop: "static" });
+            const box_4 = new bootstrap.Modal(document.getElementById("settings"), { backdrop: "static" });
             const msg = document.querySelector("div.msg");
             let { loggedin } = JSON.parse(localStorage.getItem("default")) || false;
             let today = new Date(Date.now());
             let chart = false;
+            const candles = {
+                M1: 60 * 60 * 24 * 7,
+                M5: 12 * 24 * 7,
+                M15: 4 * 24 * 7,
+                M30: 2 * 24 * 7,
+                H1: 24 * 7,
+                D1: 100,
+                W1: 100,
+                MN1: 100,
+            };
 
             // Form Submit
             form.addEventListener("submit", async (e) => {
@@ -519,6 +535,8 @@
                 bt2.classList.remove("hide");
 
                 if ((await response).status === 200) {
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+
                     // Start App
                     loggedin = true;
                     setDefault();
@@ -528,7 +546,6 @@
                     stop_loss();
                     take_profit();
                     deviation();
-                    chart_display();
                     buy_sell();
                     buy_Order();
                     buy_stop_Order();
@@ -536,14 +553,16 @@
                     sell_stop_Order();
                     double_instant_Order();
                     double_pending_Order();
-                    trades();
                     close_app();
 
                     setInterval(() => {
                         buy_sell();
-                        chart_display();
-                        trades();
                     }, 500);
+
+                    if (defaultValues.autoTrade) {
+                        submit_atr.classList.add("hide");
+                        notf_atr.classList.remove("hide");
+                    }
 
                     box_l.hide();
                 } else {
@@ -560,25 +579,43 @@
 
             // Initialize Default Values
             // ==============================================================================================
-            const setDefault = () => {
+            const setDefault = async () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default")) || false;
 
-                if (!defaultValues) {
-                    const data = {
-                        loggedin: true,
+                // Save
+                const response = await fetch("/settings", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
                         pair: "Step Index",
                         timeframe: "M15",
                         lot: 0.2,
                         deviation: 20,
                         sl: 0.5,
                         tp: 100,
-                        ntr: 2,
-                    };
+                    }),
+                });
 
-                    localStorage.setItem("default", JSON.stringify(data));
-                } else {
-                    defaultValues.loggedin = true;
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                if ((await response).status === 200) {
+                    if (!defaultValues) {
+                        const data = {
+                            loggedin: true,
+                            pair: "Step Index",
+                            timeframe: "M15",
+                            lot: 0.2,
+                            deviation: 20,
+                            sl: 0.5,
+                            tp: 100,
+                            ntr: 1,
+                        };
+
+                        localStorage.setItem("default", JSON.stringify(data));
+                    } else {
+                        defaultValues.loggedin = true;
+                        localStorage.setItem("default", JSON.stringify(defaultValues));
+                    }
                 }
             };
 
@@ -592,19 +629,11 @@
 
                 // Loop
                 for (const prop of data) {
-                    options += `<option value=${prop.replaceAll(" ", "_")} ${defaultValues.pair === prop ? "selected" : ""}>${prop}</option>`;
+                    options += `<option value=${prop.replaceAll(" ", "_")} ${defaultValues.pair.replaceAll("_", " ") === prop ? "selected" : ""}>${prop}</option>`;
                 }
 
                 c_pairs.innerHTML = options;
                 atr_pairs.innerHTML = options;
-
-                c_pairs.addEventListener("change", (e) => {
-                    defaultValues.pair = e.target.value.replaceAll("_", " ");
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
-
-                    chart_display();
-                    buy_sell();
-                });
             };
 
             // Get Timeframes
@@ -621,13 +650,7 @@
                 }
 
                 timeframes.innerHTML = options;
-
-                timeframes.addEventListener("change", (e) => {
-                    defaultValues.timeframe = e.target.value.replaceAll("_", " ");
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
-
-                    chart_display();
-                });
+                timeframes_0.innerHTML = options;
             };
 
             // Get Lot Size
@@ -637,11 +660,6 @@
                 lot.value = defaultValues.lot;
                 atr_lot.value = defaultValues.lot;
                 atr_ntr.value = defaultValues.ntr;
-
-                lot.addEventListener("keyup", (e) => {
-                    defaultValues.lot = e.target.value;
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
-                });
             };
 
             // Get stop loss
@@ -649,11 +667,6 @@
             const stop_loss = () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 sl.value = defaultValues.sl;
-
-                sl.addEventListener("keyup", (e) => {
-                    defaultValues.sl = e.target.value;
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
-                });
             };
 
             // Get Take Profit
@@ -661,11 +674,6 @@
             const take_profit = () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 tp.value = defaultValues.tp;
-
-                tp.addEventListener("keyup", (e) => {
-                    defaultValues.tp = e.target.value;
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
-                });
             };
 
             // Get Deviation
@@ -673,100 +681,6 @@
             const deviation = () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 devtn.value = defaultValues.deviation;
-
-                devtn.addEventListener("keyup", (e) => {
-                    defaultValues.deviation = e.target.value;
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
-                });
-            };
-
-            // RenderChart
-            // ==============================================================================================
-            google.charts.load("current", { packages: ["corechart"] });
-
-            function drawChart(_data) {
-                var data = google.visualization.arrayToDataTable([..._data], true);
-
-                var options = {
-                    legend: "none",
-                    fontName: "Inter",
-                    fontSize: 12,
-                    candlestick: {
-                        fallingColor: { strokeWidth: 0, fill: "#a52714" }, // red
-                        risingColor: { strokeWidth: 0, fill: "#0f9d58" }, // green
-                    },
-                    chartArea: {
-                        top: 20,
-                        bottom: 55,
-                        width: "94%",
-                        height: "75%",
-                        left: 5,
-                    },
-                    hAxis: {
-                        textStyle: {
-                            color: "#202a44",
-                            fontName: "Inter",
-                            fontSize: 9,
-                            bold: true,
-                        },
-                        slantedText: true,
-                        slantedTextAngle: 90,
-                        showTextEvery: 1,
-                        viewWindowMode: "pretty",
-                    },
-                    series: {
-                        0: { targetAxisIndex: 1 },
-                    },
-                    vAxes: {
-                        0: { textPosition: "none" },
-                        1: {},
-                    },
-                    vAxis: {
-                        gridlines: {
-                            color: "#f5f5f5",
-                            count: 10,
-                        },
-                        minorGridlines: {
-                            color: "transparent",
-                        },
-                        textStyle: {
-                            color: "#202a44",
-                            fontName: "Inter",
-                            fontSize: 9,
-                            bold: true,
-                        },
-                        baselineColor: "red",
-                    },
-                };
-
-                if (chart) {
-                    chart.clearChart();
-                    chart.draw(data, options);
-                } else {
-                    chart = new google.visualization.CandlestickChart(document.getElementById("chart_div"));
-                    chart.draw(data, options);
-                }
-            }
-
-            const chart_display = async () => {
-                const defaultValues = JSON.parse(localStorage.getItem("default"));
-                const timeframe = defaultValues.timeframe !== undefined ? defaultValues.timeframe : "M15";
-                const pair = defaultValues.pair !== undefined ? defaultValues.pair.replaceAll("_", " ") : "M15";
-
-                // Send Request
-                const response = await fetch("/chartData", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        timeframe: timeframe,
-                        pair: pair,
-                    }),
-                });
-
-                const _data = await response.json();
-                google.charts.setOnLoadCallback(drawChart(_data));
             };
 
             // Buy n Sell
@@ -777,13 +691,7 @@
 
                 // Send Request
                 const response = await fetch("/bid_ask", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        pair: pair,
-                    }),
+                    method: "GET",
                 });
 
                 const _data = await response.json();
@@ -812,17 +720,12 @@
                     const price = e.target[0].value;
 
                     // Send Request
-                    const response = await fetch("/buy_order", {
+                    const response = await fetch("/order/instant/buy", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            pair: pair,
-                            lot_size: lot_size,
-                            deviation: deviation,
-                            stop_loss: stop_loss,
-                            take_profit: take_profit,
                             price: price,
                         }),
                     });
@@ -886,17 +789,12 @@
                     const price = e.target[0].value;
 
                     // Send Request
-                    const response = await fetch("/buy_stop_order", {
+                    const response = await fetch("/order/pending/buy_stop", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            pair: pair,
-                            lot_size: lot_size,
-                            deviation: deviation,
-                            stop_loss: stop_loss,
-                            take_profit: take_profit,
                             price: price,
                         }),
                     });
@@ -961,17 +859,12 @@
                     const price = e.target[0].value;
 
                     // Send Request
-                    const response = await fetch("/sell_order", {
+                    const response = await fetch("/order/instant/sell", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            pair: pair,
-                            lot_size: lot_size,
-                            deviation: deviation,
-                            stop_loss: stop_loss,
-                            take_profit: take_profit,
                             price: price,
                         }),
                     });
@@ -1035,17 +928,12 @@
                     const price = e.target[0].value;
 
                     // Send Request
-                    const response = await fetch("/double_instant", {
+                    const response = await fetch("/order/instant/double", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            pair: pair,
-                            lot_size: lot_size,
-                            deviation: deviation,
-                            stop_loss: stop_loss,
-                            take_profit: take_profit,
                             price: price,
                         }),
                     });
@@ -1093,7 +981,7 @@
                 });
             };
 
-            // Place Buy Stop Order
+            // Place Sell Stop Order
             // ==============================================================================================
             const sell_stop_Order = () => {
                 fssell.addEventListener("submit", async (e) => {
@@ -1108,17 +996,12 @@
                     const price = e.target[0].value;
 
                     // Send Request
-                    const response = await fetch("/sell_stop_order", {
+                    const response = await fetch("/order/pending/sell_stop", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            pair: pair,
-                            lot_size: lot_size,
-                            deviation: deviation,
-                            stop_loss: stop_loss,
-                            take_profit: take_profit,
                             price: price,
                         }),
                     });
@@ -1182,17 +1065,12 @@
                     const price = e.target[0].value;
 
                     // Send Request
-                    const response = await fetch("/double_pending", {
+                    const response = await fetch("/order/pending/double", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            pair: pair,
-                            lot_size: lot_size,
-                            deviation: deviation,
-                            stop_loss: stop_loss,
-                            take_profit: take_profit,
                             price: price,
                         }),
                     });
@@ -1245,7 +1123,7 @@
             // ==============================================================================================
             const trades = async () => {
                 // Send Request
-                const response = await fetch("/trades", {
+                const response = await fetch("/orders", {
                     method: "GET",
                 });
 
@@ -1322,13 +1200,12 @@
                     each.addEventListener("click", async (e) => {
                         const index = e.target.dataset.index;
                         // Send Request
-                        const response = await fetch("/close_itr", {
+                        const response = await fetch("/order/instant/close", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                             },
                             body: JSON.stringify({
-                                deviation: deviation,
                                 index: index,
                             }),
                         });
@@ -1387,7 +1264,7 @@
                     each.addEventListener("click", async (e) => {
                         const ticket = e.target.dataset.ticket;
                         // Send Request
-                        const response = await fetch("/close_ptr", {
+                        const response = await fetch("/order/pending/close", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -1463,7 +1340,9 @@
                 e.preventDefault();
                 const lot = e.target[0].value;
                 const pair = e.target[1].value;
-                const ntr = e.target[2].value;
+                const tmp = e.target[2].value;
+                const ntr = e.target[3].value;
+                const cdl = candles[tmp];
 
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 defaultValues["autoTrade"] = true;
@@ -1474,21 +1353,20 @@
                 notf_atr.classList.remove("hide");
                 box_3.hide();
 
-                fetch("/auto_trade", {
+                fetch("/order/auto/start", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        lot: lot,
-                        pair: pair.replaceAll("_", " "),
                         ntr: ntr,
+                        candles: cdl,
                     }),
                 });
             });
 
             stop_at.addEventListener("click", async () => {
-                const response = await fetch("/sta_trade", {
+                const response = await fetch("/order/auto/stop", {
                     method: "GET",
                 });
 
@@ -1504,6 +1382,55 @@
                 }
             });
 
+            // Settings
+            // ==============================================================================================
+            stn.addEventListener("click", (e) => {
+                box_4.toggle();
+            });
+
+            submit_stn.addEventListener("click", (e) => {
+                save_stn.click();
+            });
+
+            fstn.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                // Save
+                const response = await fetch("/settings", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        pair: e.target[0].value,
+                        timeframe: e.target[1].value,
+                        lot: e.target[2].value,
+                        sl: e.target[3].value,
+                        tp: e.target[4].value,
+                        deviation: e.target[5].value,
+                    }),
+                });
+
+                if ((await response).status === 200) {
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+
+                    // Update Default Values
+                    defaultValues.pair = e.target[0].value;
+                    defaultValues.timeframe = e.target[1].value;
+                    defaultValues.lot = e.target[2].value;
+                    defaultValues.sl = e.target[3].value;
+                    defaultValues.tp = e.target[4].value;
+                    defaultValues.deviation = e.target[5].value;
+
+                    // Save
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                    box_4.hide();
+                }
+
+                // Update
+                buy_sell();
+            });
+
             // Load App
             // ==============================================================================================
             window.onload = () => {
@@ -1515,7 +1442,6 @@
                     stop_loss();
                     take_profit();
                     deviation();
-                    chart_display();
                     buy_sell();
                     buy_Order();
                     buy_stop_Order();
@@ -1523,14 +1449,17 @@
                     sell_stop_Order();
                     double_instant_Order();
                     double_pending_Order();
-                    trades();
                     close_app();
 
                     setInterval(() => {
                         buy_sell();
-                        chart_display();
-                        trades();
                     }, 500);
+
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    if (defaultValues.autoTrade) {
+                        submit_atr.classList.add("hide");
+                        notf_atr.classList.remove("hide");
+                    }
                 } else {
                     box_l.show();
                 }

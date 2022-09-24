@@ -1,0 +1,184 @@
+<!-- <div class="left-container h-100 d-none">
+    <div class="content-div A px-3 py-2">
+        <div class="d-flex justify-content-between">
+            <div class="input-group" style="width: calc((100% / 4))">
+                <span class="input-group-text">Pairs</span>
+                <select class="form-select form-select-sm" id="c_pairs" aria-label=".form-select-sm" value="Step Index"></select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Timeframe</span>
+                <select class="form-select form-select-sm" id="timeframe" aria-label=".form-select-sm" value="M15"></select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Lot</span>
+                <input type="number" class="form-control form-control-sm" id="lot" placeholder="0.10" />
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Deviation</span>
+                <input type="number" class="form-control form-control-sm" id="deviation" placeholder="20" />
+            </div>
+        </div>
+        <div id="chart_div" class="pt-3" style="height: calc(100% - 2rem); width: auto"></div>
+    </div>
+    <div class="content-div B py-2 px-3 position-relative" style="font-size: 0.7rem">
+        <div class="d-flex align-items-start justify-content-end h-100">
+            <div class="nav nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical" style="transform: rotate(-90deg)">
+                <button class="nav-link active" id="v-pills-activetrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-activetrades" type="button" role="tab" aria-controls="v-pills-activetrades" aria-selected="true">ACTIVE</button>
+                <button class="nav-link" id="v-pills-pendingtrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pendingtrades" type="button" role="tab" aria-controls="v-pills-pendingtrades" aria-selected="false">PENDING</button>
+            </div>
+            <div class="tab-content h-100" id="v-pills-tabContent" style="width: 98%">
+                <div class="tab-pane h-100 fade show active" id="v-pills-activetrades" role="tabpanel" aria-labelledby="v-pills-activetrades-tab">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 16%">Symbol</th>
+                                <th scope="col" style="width: 15%">Ticket</th>
+                                <th scope="col" style="width: 7%">Type</th>
+                                <th scope="col" style="width: 7%" class="text-center">Lot</th>
+                                <th scope="col" style="width: 11%">Stop Loss</th>
+                                <th scope="col" style="width: 11%">Take Profit</th>
+                                <th scope="col" style="width: 11%">Entry</th>
+                                <th scope="col" style="width: 10%">Current</th>
+                                <th scope="col" style="width: 15%">Profit</th>
+                                <th scope="col" style="width: 3%">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                        <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
+                                    </svg>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="actv"></tbody>
+                    </table>
+                </div>
+                <div class="tab-pane h-100 fade" id="v-pills-pendingtrades" role="tabpanel" aria-labelledby="v-pills-pendingtrades-tab">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 16%">Symbol</th>
+                                <th scope="col" style="width: 15%">Ticket</th>
+                                <th scope="col" style="width: 7%">Type</th>
+                                <th scope="col" style="width: 7%" class="text-center">Lot</th>
+                                <th scope="col" style="width: 11%">Stop Loss</th>
+                                <th scope="col" style="width: 11%">Take Profit</th>
+                                <th scope="col" style="width: 11%">Entry</th>
+                                <th scope="col" style="width: 10%">Current</th>
+                                <th scope="col" style="width: 15%">Profit</th>
+                                <th scope="col" style="width: 3%">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                        <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
+                                    </svg>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="pndn"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- ======================================================================================================================= -->
+<!-- <div class="d-flex justify-content-between">
+    <div class="text-center" style="width: 47%">
+        <label for="stop_loss" class="form-label mb-1" style="font-size: 13px">Stop Loss:</label>
+        <input type="number" class="form-control text-center" id="stop_loss" placeholder="0.5" step="0.5" />
+    </div>
+    <div class="text-center" style="width: 47%">
+        <label for="take_profit" class="form-label mb-1" style="font-size: 13px">Take Profit:</label>
+        <input type="number" class="form-control text-center" id="take_profit" placeholder="100" step="20" />
+    </div>
+</div> -->
+
+<!-- ======================================================================================================================= -->
+
+<!-- // RenderChart
+            // ==============================================================================================
+            google.charts.load("current", { packages: ["corechart"] });
+
+            function drawChart(_data) {
+                var data = google.visualization.arrayToDataTable([..._data], true);
+
+                var options = {
+                    legend: "none",
+                    fontName: "Inter",
+                    fontSize: 12,
+                    candlestick: {
+                        fallingColor: { strokeWidth: 0, fill: "#a52714" }, // red
+                        risingColor: { strokeWidth: 0, fill: "#0f9d58" }, // green
+                    },
+                    chartArea: {
+                        top: 20,
+                        bottom: 55,
+                        width: "94%",
+                        height: "75%",
+                        left: 5,
+                    },
+                    hAxis: {
+                        textStyle: {
+                            color: "#202a44",
+                            fontName: "Inter",
+                            fontSize: 9,
+                            bold: true,
+                        },
+                        slantedText: true,
+                        slantedTextAngle: 90,
+                        showTextEvery: 1,
+                        viewWindowMode: "pretty",
+                    },
+                    series: {
+                        0: { targetAxisIndex: 1 },
+                    },
+                    vAxes: {
+                        0: { textPosition: "none" },
+                        1: {},
+                    },
+                    vAxis: {
+                        gridlines: {
+                            color: "#f5f5f5",
+                            count: 10,
+                        },
+                        minorGridlines: {
+                            color: "transparent",
+                        },
+                        textStyle: {
+                            color: "#202a44",
+                            fontName: "Inter",
+                            fontSize: 9,
+                            bold: true,
+                        },
+                        baselineColor: "red",
+                    },
+                };
+
+                if (chart) {
+                    chart.clearChart();
+                    chart.draw(data, options);
+                } else {
+                    chart = new google.visualization.CandlestickChart(document.getElementById("chart_div"));
+                    chart.draw(data, options);
+                }
+            }
+
+            const chart_display = async () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const timeframe = defaultValues.timeframe !== undefined ? defaultValues.timeframe : "M15";
+                const pair = defaultValues.pair !== undefined ? defaultValues.pair.replaceAll("_", " ") : "M15";
+
+                // Send Request
+                const response = await fetch("/chartData", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        timeframe: timeframe,
+                        pair: pair,
+                    }),
+                });
+
+                const _data = await response.json();
+                google.charts.setOnLoadCallback(drawChart(_data));
+            }; -->
