@@ -501,16 +501,6 @@
             let { loggedin } = JSON.parse(localStorage.getItem("default")) || false;
             let today = new Date(Date.now());
             let chart = false;
-            const candles = {
-                M1: 60 * 60 * 24 * 7,
-                M5: 12 * 24 * 7,
-                M15: 4 * 24 * 7,
-                M30: 2 * 24 * 7,
-                H1: 24 * 7,
-                D1: 100,
-                W1: 100,
-                MN1: 100,
-            };
 
             // Form Submit
             form.addEventListener("submit", async (e) => {
@@ -528,6 +518,12 @@
                         account: account,
                         password: password,
                         server: server,
+                        pair: "Step Index",
+                        timeframe: "M15",
+                        lot: 0.2,
+                        deviation: 20,
+                        sl: 0.5,
+                        tp: 100,
                     }),
                 });
 
@@ -582,40 +578,22 @@
             const setDefault = async () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default")) || false;
 
-                // Save
-                const response = await fetch("/settings", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
+                if (!defaultValues) {
+                    const data = {
+                        loggedin: true,
                         pair: "Step Index",
                         timeframe: "M15",
                         lot: 0.2,
                         deviation: 20,
                         sl: 0.5,
                         tp: 100,
-                    }),
-                });
+                        ntr: 1,
+                    };
 
-                if ((await response).status === 200) {
-                    if (!defaultValues) {
-                        const data = {
-                            loggedin: true,
-                            pair: "Step Index",
-                            timeframe: "M15",
-                            lot: 0.2,
-                            deviation: 20,
-                            sl: 0.5,
-                            tp: 100,
-                            ntr: 1,
-                        };
-
-                        localStorage.setItem("default", JSON.stringify(data));
-                    } else {
-                        defaultValues.loggedin = true;
-                        localStorage.setItem("default", JSON.stringify(defaultValues));
-                    }
+                    localStorage.setItem("default", JSON.stringify(data));
+                } else {
+                    defaultValues.loggedin = true;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
                 }
             };
 
@@ -1342,7 +1320,6 @@
                 const pair = e.target[1].value;
                 const tmp = e.target[2].value;
                 const ntr = e.target[3].value;
-                const cdl = candles[tmp];
 
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 defaultValues["autoTrade"] = true;
@@ -1360,7 +1337,6 @@
                     },
                     body: JSON.stringify({
                         ntr: ntr,
-                        candles: cdl,
                     }),
                 });
             });

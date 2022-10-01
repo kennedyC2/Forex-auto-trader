@@ -2,6 +2,7 @@
 # ==============================================================================
 from flask import Flask, jsonify, request, render_template, make_response
 from mt5.phantom import BBB
+import threading
 
 # Instantiate
 # ==============================================================================
@@ -31,11 +32,36 @@ def auth():
         data = request.get_json(force=True)
 
         # Instantiate BBB
-        Trader = BBB(data["account"], data["password"], data["server"])
+        Trader = BBB(data["account"], data["password"], data["server"], data["pair"],
+                     data["timeframe"], data["lot"], data["sl"], data["tp"], data["deviation"])
         account = Trader.Connect()
 
         # Send Response If Successfully logged In
         if account["status"]:
+            # Trade Tracker Thread
+            global t_trade
+            t_trade = threading.Thread(
+                target=Trader.track_Trade, args=(), daemon=False)
+
+            # RSI Thread
+            global s_RSI
+            s_RSI = threading.Thread(
+                target=Trader.c_RSI, args=(), daemon=False)
+
+            # Fetcher Thread
+            global s_fetcher
+            s_fetcher = threading.Thread(
+                target=Trader.fetcher, args=(), daemon=False)
+
+            # Start Thread
+            t_trade.start()
+
+            # Start RSI Thread
+            s_RSI.start()
+
+            # Start Fetcher Thread
+            s_fetcher.start()
+
             response = make_response(
                 jsonify(
                     {"message": account["message"]}
@@ -385,7 +411,14 @@ def trade_start():
     if request.method == "POST":
         data = request.get_json(force=True)
         Trader.auto_trade = True
-        Trader.start_auto(data["ntr"], data["candles"])
+
+        # Start Thread
+        global s_thread
+        s_thread = threading.Thread(target=Trader.start_auto, args=(
+            data["ntr"],), daemon=False)
+
+        s_thread.start()
+
         response = make_response(
             jsonify(
                 {"message": "success"}
@@ -405,6 +438,7 @@ def trade_stop():
         Trader.auto_trade = False
         Trader.AvG = 0
         Trader.AvL = 0
+
         response = make_response(
             jsonify(
                 {"message": "success"}
@@ -442,4 +476,4 @@ def settings():
 
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=True)

@@ -1,9 +1,9 @@
 # Import Dependencies
 # ==============================================================================
+from pickle import FALSE
 import MetaTrader5 as mt5
 import numpy
 from datetime import datetime
-from threading import Timer
 from time import sleep
 import threading
 
@@ -12,7 +12,7 @@ import threading
 #                               Class Object
 # ==============================================================================
 class BBB:
-    def __init__(self, account, password, server):
+    def __init__(self, account, password, server, pair, timeframe, lot, sl, tp, deviation):
         self.Account = int(account)
         self.Password = password
         self.Server = server
@@ -26,6 +26,16 @@ class BBB:
             "W1": mt5.TIMEFRAME_W1,
             "MN1": mt5.TIMEFRAME_MN1,
         }
+        self.candles = {
+            "M1": 60 * 60 * 24 * 7,
+            "M5": 12 * 24 * 7,
+            "M15": 4 * 24 * 7,
+            "M30": 2 * 24 * 7,
+            "H1": 24 * 7,
+            "D1": 100,
+            "W1": 100,
+            "MN1": 100,
+        }
 
         self.Timeframe_list = [
             "M1", "M5", "M15", "M30", "H1", "D1", "W1", "MN1"]
@@ -34,14 +44,15 @@ class BBB:
         self.L_L = set()
 
         # Settings
-        self.pair = False
-        self.timeframe = False
-        self.lot = False
-        self.sl = False
-        self.tp = False
-        self.deviation = False
+        self.pair = pair
+        self.timeframe = timeframe
+        self.lot = lot
+        self.sl = sl
+        self.tp = tp
+        self.deviation = deviation
         self.magic = 112026457
 
+        # BOTS
         self.bot_B = {
             "active": False,
             "trades": 0,
@@ -62,6 +73,7 @@ class BBB:
         self.neg = 0
 
         self.connection = False
+        self.track = False
         self.auto_trade = False
 
     # Initialize MetaTrader 5 n Log Client In
@@ -71,12 +83,7 @@ class BBB:
             if not mt5.initialize(path="C:/Program Files/MetaTrader 5/terminal64.exe", login=self.Account, password=self.Password, server=self.Server, timeout=60000, portable=False):
                 return {"status": False, "message": mt5.last_error()}
             else:
-                # Define threads
-                t_trade = threading.Thread(target=self.track_Trade)
-
-                # Start Process
-                t_trade.start()
-
+                # Return
                 return {"status": True, "message": "success"}
 
     # Get Symbols || Currency Pair
@@ -215,7 +222,7 @@ class BBB:
         if response.retcode != mt5.TRADE_RETCODE_DONE:
             return {"status": False, "message": response.comment}
         else:
-            return {"status": True, "message": self.Orders()}
+            return {"status": True}
 
     # Place Buy_Stop Order
     # ===================================================================================
@@ -273,7 +280,7 @@ class BBB:
         if response.retcode != mt5.TRADE_RETCODE_DONE:
             return {"status": False, "message": response.comment}
         else:
-            return {"status": True, "message": self.Orders()}
+            return {"status": True}
 
     # Place Sell_Stop Order
     # ===================================================================================
@@ -457,77 +464,70 @@ class BBB:
     # RSI
     # ============================================================================
     def c_RSI(self):
-        while self.auto_trade:
-            # if not self.AvG and not self.AvL:
-            data = mt5.copy_rates_from_pos(
-                self.pair, mt5.TIMEFRAME_M15, 0, 15)
-            TG = 0
-            TL = 0
+        while 1:
+            if not self.AvG and not self.AvL:
+                data = mt5.copy_rates_from_pos(
+                    self.pair, self.Timeframe_Dict["D1"], 0, 731)
+                TG = 0
+                TL = 0
 
-            # Compute AvG and AvL
-            for i in range(len(data) - 1):
-                if data[i + 1][4] > data[i][4]:
-                    TG += data[i + 1][4] - data[i][4]
+                # Compute AvG and AvL
+                for i in range(730):
+                    if data[i + 1][4] > data[i][4]:
+                        TG += data[i + 1][4] - data[i][4]
+                        self.pos = data[i + 1][4] - data[i][4]
+                    else:
+                        TL += (data[i + 1][4] - data[i][4]) * -1
+                        self.neg = (data[i + 1][4] - data[i][4]) * -1
+
+                self.AvG = (TG / 14)
+                self.AvL = (TL / 14)
+
+                # RSI = 100 - (100 / (1 + (AvG / AvL)))
+                if self.AvL != 0:
+                    self.rsi = round(
+                        100 - (100 / (1 + (self.AvG / self.AvL))), 2)
                 else:
-                    TL += data[i][4] - data[i + 1][4]
-
-            self.AvG = (TG / 14)
-            self.AvL = (TL / 14)
-
-            # RSI = 100 - (100 / (1 + (AvG / AvL)))
-            if self.AvL != 0:
-                self.rsi = round(
-                    100 - (100 / (1 + (self.AvG / self.AvL))), 2)
+                    if self.AvG != 0:
+                        self.rsi = 100
+                    else:
+                        self.rsi = 50
+                print(self.rsi)
             else:
-                if self.AvG != 0:
-                    self.rsi = 100
+                data = mt5.copy_rates_from_pos(
+                    self.pair, self.Timeframe_Dict[self.timeframe], 0, 2)
+
+                # New Average
+                if data[1][4] > data[0][4]:
+                    self.AvG = (((self.AvG * 14) - (self.pos)) +
+                                (data[1][4] - data[0][4])) / 14
+                    self.pos = data[1][4] - data[0][4]
                 else:
-                    self.rsi = 50
-            print("RSI:", self.rsi)
-            # else:
-            #     data = mt5.copy_rates_from_pos(
-            #         self.pair, self.Timeframe_Dict[self.timeframe], 0, 2)
+                    self.AvL = (((self.AvL * 14) - (self.neg)) +
+                                ((data[1][4] - data[0][4]) * -1)) / 14
+                    self.neg = (data[1][4] - data[0][4]) * -1
 
-            #     # New Average
-            #     if data[1][4] > data[0][4]:
-            #         self.AvG = ((self.AvG * 13) - (self.pos) +
-            #                     (data[1][4] - data[0][4])) / 14
-            #         self.AvL = self.AvL - self.neg
-            #         self.pos = data[1][4] - data[0][4]
-            #         self.neg = 0
-            #     else:
-            #         self.AvL = ((self.AvL * 13) - (self.neg) +
-            #                     (data[0][4] - data[1][4])) / 14
-            #         self.AvG = self.AvG - self.pos
-            #         self.neg = data[0][4] - data[1][4]
-            #         self.pos = 0
-
-            #     # RSI = 100 - (100 / (1 + (AvG / AvL)))
-            #     if self.AvL != 0:
-            #         self.rsi = round(
-            #             100 - (100 / (1 + (self.AvG / self.AvL))), 2)
-            #     else:
-            #         if self.AvG != 0:
-            #             self.rsi = 100
-            #         else:
-            #             self.rsi = 50
-            #     print("RSI:", self.rsi)
+                # RSI = 100 - (100 / (1 + (AvG / AvL)))
+                if self.AvL != 0:
+                    self.rsi = round(
+                        100 - (100 / (1 + (self.AvG / self.AvL))), 2)
+                else:
+                    if self.AvG != 0:
+                        self.rsi = 100
+                    else:
+                        self.rsi = 50
+                print(self.rsi)
 
             # Wait
-            sleep(2)
+            sleep(5)
 
     # Track Trade
     # ============================================================================
 
     def track_Trade(self):
-        while True:
-            # Wait
-            sleep(0.5)
-
+        while 1:
             # Get Orders
             positions = mt5.positions_get()
-
-            print("Tracking Trades,", "Positions:", len(positions))
 
             if len(positions) > 0:
                 for prop in positions:
@@ -556,6 +556,12 @@ class BBB:
                             # Close Order
                             mt5.order_send(request)
 
+                            # Update number of positions
+                            if type == mt5.ORDER_TYPE_SELL:
+                                self.bot_B["trades"] -= 1
+                            else:
+                                self.bot_S["trades"] -= 1
+
                         # If Current Trade Has maintained a Low Profit 5 Consecutive Times, End Trade
                         if self.items[prop.ticket] >= 3:
                             # Instantiate Request Object
@@ -577,6 +583,12 @@ class BBB:
                             mt5.order_send(request)
                             del self.items[prop.ticket]
 
+                            # Update number of positions
+                            if type == mt5.ORDER_TYPE_SELL:
+                                self.bot_B["trades"] -= 1
+                            else:
+                                self.bot_S["trades"] -= 1
+
                         # If Current Profit On Order Is Not Incrementing, Update count
                         if prop.profit > 0 and prop.profit < (3 * prop.volume):
                             self.items[prop.ticket] += 1
@@ -584,7 +596,7 @@ class BBB:
                     # If Order Is Not Being Tracked
                     else:
                         # Check If In Loss And If Current Loss Is 2 Pips Or Greater, Below 0.
-                        # If Requirements Meet, Close Trade.
+                        # If Above Requirements Meet, Close Trade.
                         if prop.profit <= (0 - (2 * prop.volume)):
                             type = mt5.ORDER_TYPE_SELL if prop.type == 0 else mt5.ORDER_TYPE_BUY
 
@@ -606,84 +618,65 @@ class BBB:
                             # Close Order
                             mt5.order_send(request)
 
+                            # Update number of positions
+                            if type == mt5.ORDER_TYPE_SELL:
+                                self.bot_B["trades"] -= 1
+                            else:
+                                self.bot_S["trades"] -= 1
+
                         # Check If Current Profit Is Above 2 Pips,
                         # Add To Tracked Orders
                         elif prop.profit > (2 * prop.volume):
                             self.items[prop.ticket] = 1
 
+            # Wait
+            sleep(1)
+
     # Fetch return Prices
     # ============================================================================
-    def fetcher(self, candles):
-        # Fetch Candles
-        data = mt5.copy_rates_from_pos(
-            self.pair, self.Timeframe_Dict[self.timeframe], 1, candles + 6)
 
-        # Filter returning Highs
-        for i in range(len(data)):
-            counter_1 = 0
-            counter_2 = 0
+    def fetcher(self):
+        while 1:
+            # Fetch Candles
+            data = mt5.copy_rates_from_pos(
+                self.pair, self.Timeframe_Dict[self.timeframe], 1, self.candles[self.timeframe] + 6)
 
-            # Get Downtrend return Prices:
-            # Check If Current Candle High Is Greater Than Next Candle High
-            # Check If Next Candle closing Price Is Less Than Its Opening Price
-            if (i <= len(data) - 6):
-                for j in range(1, 6):
-                    if data[i + j - 1][4] > data[i + j][4]:
-                        counter_1 += 1
+            # Filter returning Highs
+            for i in range(len(data)):
+                counter_1 = 0
+                counter_2 = 0
 
-                if counter_1 >= 4:
-                    self.H_H.add(data[i][2])
-                else:
+                # Get Downtrend return Prices:
+                # Check If Current Candle High Is Greater Than Next Candle High
+                # Check If Next Candle closing Price Is Less Than Its Opening Price
+                if (i <= len(data) - 6):
                     for j in range(1, 6):
-                        if data[i + j - 1][4] < data[i + j][4]:
-                            counter_2 += 1
+                        if data[i + j - 1][4] > data[i + j][4]:
+                            counter_1 += 1
 
-                    if counter_2 >= 4:
-                        self.L_L.add(data[i][3])
-            else:
-                break
+                    if counter_1 >= 4:
+                        self.H_H.add(data[i][2])
+                    else:
+                        for j in range(1, 6):
+                            if data[i + j - 1][4] < data[i + j][4]:
+                                counter_2 += 1
+
+                        if counter_2 >= 4:
+                            self.L_L.add(data[i][3])
+                else:
+                    break
+
+            # Wait
+            sleep(60 * 60 * 12)
 
     # Auto Trader 1
     # ============================================================================
 
     def auto_T1(self, price, no_of_trades):
         # Update Status
-        self.bot_B["active"] = True
-
-        print("BOT_B")
-
-        # Initialize
-        while self.bot_B["trades"] < int(no_of_trades) / 2:
-            # Get Current Tick Info
-            info = (mt5.symbol_info(self.pair))._asdict()
-
-            # Check If Current Price Is Either 5 pips below or 5 pips above
-            if info["ask"] - price <= 0.5 or price - info["ask"] <= 0.5:
-                self.Instant_Sell_Order(
-                    self.lot, self.pair, self.deviation, self.sl, self.tp, info["ask"])
-
-                self.bot_B["price"] = info["ask"]
-
-                # Wait
-                sleep(10)
-
-                # Update Status
-                self.bot_B["active"] = False
-
-                # Return
-                return
-
-            # Wait
-            sleep(10)
-
-    # Auto Trader 2
-    # ============================================================================
-
-    def auto_T2(self, price, no_of_trades):
-        # Update Status
         self.bot_S["active"] = True
 
-        print("BOT_S")
+        print("BOT_S IS ACTIVE")
 
         # Initialize
         while self.bot_S["trades"] < int(no_of_trades) / 2:
@@ -691,14 +684,14 @@ class BBB:
             info = (mt5.symbol_info(self.pair))._asdict()
 
             # Check If Current Price Is Either 5 pips below or 5 pips above
-            if info["bid"] - price <= 0.5 or price - info["bid"] <= 0.5:
-                self.Instant_Buy_Order(
-                    self.lot, self.pair, self.deviation, self.sl, self.tp, info["bid"])
+            if info["ask"] - price <= 0.5 or price - info["ask"] <= 0.5:
+                self.Instant_Sell_Order(info["ask"])
 
-                self.bot_S["price"] = info["bid"]
+                # Update Last Traded Ask Price
+                self.bot_S["price"] = info["ask"]
 
-                # Wait
-                sleep(10)
+                # Update Number of Positions Opened
+                self.bot_S["trades"] += 1
 
                 # Update Status
                 self.bot_S["active"] = False
@@ -707,23 +700,47 @@ class BBB:
                 return
 
             # Wait
-            sleep(10)
+            sleep(5)
+
+    # Auto Trader 2
+    # ============================================================================
+
+    def auto_T2(self, price, no_of_trades):
+        # Update Status
+        self.bot_B["active"] = True
+
+        print("BOT_B IS ACTIVE")
+
+        # Initialize
+        while self.bot_B["trades"] < int(no_of_trades) / 2:
+            # Get Current Tick Info
+            info = (mt5.symbol_info(self.pair))._asdict()
+
+            # Check If Current Price Is Either 5 pips below or 5 pips above
+            if info["bid"] - price <= 0.5 or price - info["bid"] <= 0.5:
+                self.Instant_Buy_Order(info["bid"])
+
+                # Update Last Traded Bid Price
+                self.bot_B["price"] = info["bid"]
+
+                # Update Number of Positions Opened
+                self.bot_B["trades"] += 1
+
+                # Update Status
+                self.bot_B["active"] = False
+
+                # Return
+                return
+
+            # Wait
+            sleep(5)
 
     # Start Auto Trading
     # ============================================================================
 
-    def start_auto(self, no_of_trades, candles):
-        # Populate Prices
-        self.fetcher(candles)
-
+    def start_auto(self, no_of_trades):
         # Get Existing Orders
         orders = mt5.positions_get()
-
-        # RSI Thread
-        s_RSI = threading.Thread(target=self.c_RSI)
-
-        # Start RSI Thread
-        s_RSI.start()
 
         if len(orders) > 0:
             # Update Counter
@@ -734,26 +751,27 @@ class BBB:
                     self.bot_S["trades"] += 1
 
         while self.auto_trade:
-            # print(self.rsi)
+            print("RSI current value is", self.rsi)
             # Check RSI
-            # if len(self.rsi) > 0:
-            #     # Get Current Tick Info
-            #     info = (mt5.symbol_info(self.pair))._asdict()
+            if self.rsi > 0:
+                # Get Current Tick Info
+                info = (mt5.symbol_info(self.pair))._asdict()
 
-            #     # Check If Database Has Been Updated And Number Of Existing Orders Are Not Greater Than Required
-            #     if len(self.H_H) > 0 and len(self.L_L) > 0:
-            #         # Start HP Monitor
-            #         if info["ask"] in self.H_H and self.bot_B["trades"] < int(no_of_trades) / 2 and not self.bot_B["active"]:
-            #             if info["ask"] - self.bot_B["price"] > 0.3 and round(float(self.lvl[0]), 1) >= 65:
-            #                 self.auto_T1(info["ask"], no_of_trades)
+                # Check If Database Has Been Updated And Number Of Existing Orders Are Not Greater Than Required
+                if len(self.H_H) > 0 and len(self.L_L) > 0:
+                    # Start HP Monitor
+                    if info["ask"] in self.H_H and self.bot_B["trades"] < int(no_of_trades) / 2 and not self.bot_S["active"]:
+                        if info["ask"] - self.bot_B["price"] > 0.3 and self.rsi >= 65:
+                            s_a1 = threading.Thread(target=self.auto_T1, args=(
+                                info["ask"], no_of_trades,), daemon=False)
+                            s_a1.start()
 
-            #         # Wait
-            #         sleep(5)
-
-            #         # Start LP Monitor
-            #         if info["bid"] in self.L_L and self.bot_S["trades"] < int(no_of_trades) / 2 and not self.bot_S["active"]:
-            #             if self.bot_S["price"] - info["bid"] > 0.3 and round(float(self.lvl[0]), 1) <= 35:
-            #                 self.auto_T2(info["bid"], no_of_trades)
+                    # Start LP Monitor
+                    if info["bid"] in self.L_L and self.bot_S["trades"] < int(no_of_trades) / 2 and not self.bot_B["active"]:
+                        if self.bot_S["price"] - info["bid"] > 0.3 and self.rsi <= 35:
+                            s_a2 = threading.Thread(target=self.auto_T2, args=(
+                                info["bid"], no_of_trades,), daemon=False)
+                            s_a2.start()
 
             # Wait
-            sleep(5)
+            sleep(10)
