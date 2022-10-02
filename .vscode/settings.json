@@ -11,6 +11,7 @@
         "bidhigh",
         "bidlow",
         "corechart",
+        "curr",
         "devtn",
         "ditr",
         "EURAUD",
@@ -52,6 +53,7 @@
         "subatr",
         "substn",
         "TIMEFRAME",
-        "timeframes"
+        "timeframes",
+        "tulipy"
     ]
 }

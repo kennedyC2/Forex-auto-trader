@@ -3,6 +3,7 @@
 from pickle import FALSE
 import MetaTrader5 as mt5
 import numpy
+import tulipy as tpy
 from datetime import datetime
 from time import sleep
 import threading
@@ -67,12 +68,10 @@ class BBB:
 
         # RSI
         self.rsi = 0
-        self.AvG = 0
-        self.AvL = 0
-        self.pos = 0
-        self.neg = 0
 
+        # Regulators
         self.connection = False
+        self.run_rt = False
         self.track = False
         self.auto_trade = False
 
@@ -133,7 +132,7 @@ class BBB:
 
     def HLOC(self):
         data = mt5.copy_rates_from_pos(
-            self.pair, self.Timeframe_Dict[self.timeframe], 0, 60)
+            self.pair, self.Timeframe_Dict[self.timeframe], 0, 50)
 
         HLOC = []
 
@@ -464,59 +463,16 @@ class BBB:
     # RSI
     # ============================================================================
     def c_RSI(self):
-        while 1:
-            if not self.AvG and not self.AvL:
-                data = mt5.copy_rates_from_pos(
-                    self.pair, self.Timeframe_Dict["D1"], 0, 731)
-                TG = 0
-                TL = 0
+        while self.run_rt:
+            data = mt5.copy_rates_from_pos(
+                self.pair, self.Timeframe_Dict[self.timeframe], 0, 1440)
 
-                # Compute AvG and AvL
-                for i in range(730):
-                    if data[i + 1][4] > data[i][4]:
-                        TG += data[i + 1][4] - data[i][4]
-                        self.pos = data[i + 1][4] - data[i][4]
-                    else:
-                        TL += (data[i + 1][4] - data[i][4]) * -1
-                        self.neg = (data[i + 1][4] - data[i][4]) * -1
+            cpArr = []
 
-                self.AvG = (TG / 14)
-                self.AvL = (TL / 14)
+            for i in range(1440):
+                cpArr.append(data[i][4])
 
-                # RSI = 100 - (100 / (1 + (AvG / AvL)))
-                if self.AvL != 0:
-                    self.rsi = round(
-                        100 - (100 / (1 + (self.AvG / self.AvL))), 2)
-                else:
-                    if self.AvG != 0:
-                        self.rsi = 100
-                    else:
-                        self.rsi = 50
-                print(self.rsi)
-            else:
-                data = mt5.copy_rates_from_pos(
-                    self.pair, self.Timeframe_Dict[self.timeframe], 0, 2)
-
-                # New Average
-                if data[1][4] > data[0][4]:
-                    self.AvG = (((self.AvG * 14) - (self.pos)) +
-                                (data[1][4] - data[0][4])) / 14
-                    self.pos = data[1][4] - data[0][4]
-                else:
-                    self.AvL = (((self.AvL * 14) - (self.neg)) +
-                                ((data[1][4] - data[0][4]) * -1)) / 14
-                    self.neg = (data[1][4] - data[0][4]) * -1
-
-                # RSI = 100 - (100 / (1 + (AvG / AvL)))
-                if self.AvL != 0:
-                    self.rsi = round(
-                        100 - (100 / (1 + (self.AvG / self.AvL))), 2)
-                else:
-                    if self.AvG != 0:
-                        self.rsi = 100
-                    else:
-                        self.rsi = 50
-                print(self.rsi)
+            self.rsi = tpy.rsi(numpy.array(cpArr), 14)[-1]
 
             # Wait
             sleep(5)
@@ -525,7 +481,7 @@ class BBB:
     # ============================================================================
 
     def track_Trade(self):
-        while 1:
+        while self.track:
             # Get Orders
             positions = mt5.positions_get()
 
@@ -636,7 +592,7 @@ class BBB:
     # ============================================================================
 
     def fetcher(self):
-        while 1:
+        while self.run_rt:
             # Fetch Candles
             data = mt5.copy_rates_from_pos(
                 self.pair, self.Timeframe_Dict[self.timeframe], 1, self.candles[self.timeframe] + 6)

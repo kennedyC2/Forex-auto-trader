@@ -17,7 +17,7 @@
                 -moz-osx-font-smoothing: grayscale;
                 scrollbar-width: thin;
                 scrollbar-color: #2c7ce558 #e3ebf6;
-                background-color: #000000;
+                background-color: #e3e6e9;
             }
 
             div,
@@ -196,7 +196,7 @@
 
                 .right-container {
                     display: block;
-                    width: 25%;
+                    /* width: 25%; */
                 }
 
                 .right-container > div:nth-child(1),
@@ -242,8 +242,71 @@
     </head>
 
     <body>
-        <div class="container-fluid p-0 w-100 h-100 d-flex align-content-center justify-content-center">
-            <!-- Removed Left Bar -->
+        <div class="container-fluid p-3 w-100 h-100 d-grid">
+            <div class="left-container h-100">
+                <div class="content-div A px-3 py-2">
+                    <div class="ps-2 pt-2 text-uppercase fw-bold" id="curr"></div>
+                    <div id="chart_div" style="height: calc(100% - 2rem); width: auto"></div>
+                </div>
+                <div class="content-div B py-2 px-3 position-relative" style="font-size: 0.7rem">
+                    <div class="d-flex align-items-start justify-content-end h-100">
+                        <div class="nav nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical" style="transform: rotate(-90deg)">
+                            <button class="nav-link active" id="v-pills-activetrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-activetrades" type="button" role="tab" aria-controls="v-pills-activetrades" aria-selected="true">ACTIVE</button>
+                            <button class="nav-link" id="v-pills-pendingtrades-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pendingtrades" type="button" role="tab" aria-controls="v-pills-pendingtrades" aria-selected="false">PENDING</button>
+                        </div>
+                        <div class="tab-content h-100" id="v-pills-tabContent" style="width: 98%">
+                            <div class="tab-pane h-100 fade show active" id="v-pills-activetrades" role="tabpanel" aria-labelledby="v-pills-activetrades-tab">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 16%">Symbol</th>
+                                            <th scope="col" style="width: 15%">Ticket</th>
+                                            <th scope="col" style="width: 7%">Type</th>
+                                            <th scope="col" style="width: 7%" class="text-center">Lot</th>
+                                            <th scope="col" style="width: 11%">Stop Loss</th>
+                                            <th scope="col" style="width: 11%">Take Profit</th>
+                                            <th scope="col" style="width: 11%">Entry</th>
+                                            <th scope="col" style="width: 10%">Current</th>
+                                            <th scope="col" style="width: 15%">Profit</th>
+                                            <th scope="col" style="width: 3%">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
+                                                </svg>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="actv"></tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane h-100 fade" id="v-pills-pendingtrades" role="tabpanel" aria-labelledby="v-pills-pendingtrades-tab">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 16%">Symbol</th>
+                                            <th scope="col" style="width: 15%">Ticket</th>
+                                            <th scope="col" style="width: 7%">Type</th>
+                                            <th scope="col" style="width: 7%" class="text-center">Lot</th>
+                                            <th scope="col" style="width: 11%">Stop Loss</th>
+                                            <th scope="col" style="width: 11%">Take Profit</th>
+                                            <th scope="col" style="width: 11%">Entry</th>
+                                            <th scope="col" style="width: 10%">Current</th>
+                                            <th scope="col" style="width: 15%">Profit</th>
+                                            <th scope="col" style="width: 3%">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle" viewBox="0 0 16 16" style="visibility: hidden">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                                    <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3z"></path>
+                                                </svg>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pndn"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="right-container h-100 px-3 py-3 position-relative" id="right-container">
                 <div class="mt-5">
                     <p class="text-center">Instant Trading</p>
@@ -450,6 +513,7 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script>
             // Dom Element
             const showBtn = document.getElementById("btn-show");
@@ -481,6 +545,7 @@
             const tbody_1 = document.getElementById("actv");
             const tbody_2 = document.getElementById("pndn");
             const quit = document.querySelector("button.quit");
+            const curr = document.getElementById("curr");
             const start_at = document.querySelector("button.atsm");
             const save_stn = document.querySelector("button.apsm");
             const submit_stn = document.querySelector("button.substn");
@@ -542,6 +607,7 @@
                     stop_loss();
                     take_profit();
                     deviation();
+                    chart_display();
                     buy_sell();
                     buy_Order();
                     buy_stop_Order();
@@ -681,6 +747,89 @@
                 isell.value = parseFloat(_data.ask).toFixed(2) || "No data";
                 ditr.value = ((parseFloat(_data.ask) + parseFloat(_data.bid)) / 2).toFixed(2) || "No data";
                 itr.innerHTML = ((parseFloat(_data.ask) + parseFloat(_data.bid)) / 2).toFixed(2) || "No data";
+            };
+
+            // RenderChart
+            // ==============================================================================================
+            google.charts.load("current", { packages: ["corechart"] });
+
+            function drawChart(_data) {
+                var data = google.visualization.arrayToDataTable([..._data], true);
+
+                var options = {
+                    legend: "none",
+                    fontName: "Inter",
+                    fontSize: 12,
+                    candlestick: {
+                        fallingColor: { strokeWidth: 0, fill: "#a52714" }, // red
+                        risingColor: { strokeWidth: 0, fill: "#0f9d58" }, // green
+                    },
+                    chartArea: {
+                        top: 20,
+                        bottom: 55,
+                        width: "94%",
+                        height: "75%",
+                        left: 5,
+                    },
+                    hAxis: {
+                        textStyle: {
+                            color: "#202a44",
+                            fontName: "Inter",
+                            fontSize: 9,
+                            bold: true,
+                        },
+                        slantedText: true,
+                        slantedTextAngle: 90,
+                        showTextEvery: 1,
+                        viewWindowMode: "pretty",
+                    },
+                    series: {
+                        0: { targetAxisIndex: 1 },
+                    },
+                    vAxes: {
+                        0: { textPosition: "none" },
+                        1: {},
+                    },
+                    vAxis: {
+                        gridlines: {
+                            color: "#08697cf5",
+                            count: 10,
+                        },
+                        // minorGridlines: {
+                        //    color: "transparent",
+                        // },
+                        textStyle: {
+                            color: "#202a44",
+                            fontName: "Inter",
+                            fontSize: 9,
+                            bold: true,
+                        },
+                        baselineColor: "red",
+                    },
+                };
+
+                if (chart) {
+                    chart.clearChart();
+                    chart.draw(data, options);
+                } else {
+                    chart = new google.visualization.CandlestickChart(document.getElementById("chart_div"));
+                    chart.draw(data, options);
+                }
+            }
+
+            const chart_display = async () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const timeframe = defaultValues.timeframe !== undefined ? defaultValues.timeframe : "M15";
+                const pair = defaultValues.pair !== undefined ? defaultValues.pair.replaceAll("_", " ") : "M15";
+
+                // Send Request
+                const response = await fetch("/chartData", {
+                    method: "GET",
+                });
+
+                const _data = await response.json();
+                curr.innerHTML = `${defaultValues.pair.replaceAll("_", " ")} [${defaultValues.timeframe}]`;
+                google.charts.setOnLoadCallback(drawChart(_data));
             };
 
             // Place Buy Order
@@ -1378,7 +1527,7 @@
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        pair: e.target[0].value,
+                        pair: e.target[0].value.replaceAll("_", " "),
                         timeframe: e.target[1].value,
                         lot: e.target[2].value,
                         sl: e.target[3].value,
@@ -1418,6 +1567,7 @@
                     stop_loss();
                     take_profit();
                     deviation();
+                    chart_display();
                     buy_sell();
                     buy_Order();
                     buy_stop_Order();
@@ -1429,6 +1579,7 @@
 
                     setInterval(() => {
                         buy_sell();
+                        chart_display();
                     }, 500);
 
                     const defaultValues = JSON.parse(localStorage.getItem("default"));

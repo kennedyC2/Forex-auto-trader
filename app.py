@@ -38,6 +38,10 @@ def auth():
 
         # Send Response If Successfully logged In
         if account["status"]:
+            # Set kick
+            # Trader.run_rt = True
+            # Trader.track = True
+
             # Trade Tracker Thread
             global t_trade
             t_trade = threading.Thread(
@@ -104,10 +108,9 @@ def timeframes():
 
 # Get Data For Candle Chart
 # ==============================================================================
-@app.route("/chartData", methods=["POST"])
+@app.route("/chartData", methods=["GET"])
 def chartData():
-    if request.method == "POST":
-        data = request.get_json(force=True)
+    if request.method == "GET":
         return jsonify(Trader.HLOC())
     return
 
@@ -455,6 +458,10 @@ def trade_stop():
 @app.route("/settings", methods=["POST"])
 def settings():
     if request.method == "POST":
+        # Stop Fetcher and RSI Calculator
+        Trader.run_rt = False
+
+        # Update Defaults
         data = request.get_json(force=True)
         Trader.pair = str(data["pair"])
         Trader.timeframe = str(data["timeframe"])
@@ -462,6 +469,23 @@ def settings():
         Trader.sl = float(data["sl"])
         Trader.tp = float(data["tp"])
         Trader.deviation = int(data["deviation"])
+
+        # start Fetcher and RSI Calculator
+        Trader.run_rt = True
+
+        # RSI Thread
+        s_RSI = threading.Thread(
+            target=Trader.c_RSI, args=(), daemon=False)
+
+        # Fetcher Thread
+        s_fetcher = threading.Thread(
+            target=Trader.fetcher, args=(), daemon=False)
+
+        # Start RSI Thread
+        s_RSI.start()
+
+        # Start Fetcher Thread
+        s_fetcher.start()
 
         # Send Response
         response = make_response(
