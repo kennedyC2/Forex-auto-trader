@@ -70,6 +70,10 @@
                 -moz-appearance: textfield;
             }
 
+            input {
+                padding-left: 1rem !important;
+            }
+
             .hide {
                 display: none;
             }
@@ -94,6 +98,22 @@
 
             .modal-dialog > div {
                 background-color: #ffffff;
+            }
+
+            .uline {
+                position: relative;
+            }
+
+            .uline::after {
+                content: " ";
+                width: 8.5rem;
+                height: 0;
+                border: 1px solid #202a44;
+                background-color: #202a44;
+                position: absolute;
+                top: 1.3rem;
+                right: calc((100% - 8.5rem) / 2);
+                transform: rotate(0);
             }
 
             .icon {
@@ -135,7 +155,7 @@
 
             p {
                 font-size: 1rem;
-                text-decoration: underline;
+                /* text-decoration: underline; */
             }
 
             .right-container .form-control {
@@ -185,7 +205,7 @@
                 }
 
                 .modal-dialog {
-                    width: 320px;
+                    width: 380px;
                 }
 
                 .left-container {
@@ -242,8 +262,8 @@
     </head>
 
     <body>
-        <div class="container-fluid p-3 w-100 h-100 d-grid">
-            <div class="left-container h-100">
+        <div class="container-fluid p-0 p-lg-3 w-100 h-100 d-lg-grid">
+            <div class="left-container h-100 d-none d-lg-grid">
                 <div class="content-div A px-3 py-2">
                     <div class="ps-2 pt-2 text-uppercase fw-bold" id="curr"></div>
                     <div id="chart_div" style="height: calc(100% - 2rem); width: auto"></div>
@@ -308,8 +328,8 @@
                 </div>
             </div>
             <div class="right-container h-100 px-3 py-3 position-relative" id="right-container">
-                <div class="mt-5">
-                    <p class="text-center">Instant Trading</p>
+                <div style="margin-top: 15%">
+                    <p class="text-center uline">Instant Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
                             <h4 id="buy" class="text-center p-1">0000.0</h4>
@@ -329,7 +349,7 @@
                 </div>
 
                 <div>
-                    <p class="text-center">Delayed Trading</p>
+                    <p class="text-center uline">Delayed Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
                             <form action="#" method="post" id="fsbuy" novalidate>
@@ -347,7 +367,7 @@
                 </div>
 
                 <div>
-                    <p class="text-center">Double Trading</p>
+                    <p class="text-center uline">Double Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
                             <h4 id="itr" class="text-center p-1">0000.0</h4>
@@ -364,12 +384,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="position-absolute" style="bottom: 10px; width: 91%">
+                <div class="position-absolute" style="bottom: 3%; width: calc(100% - 2rem)">
                     <button type="button" class="btn btn-sm w-100 btn-success" data-bs-toggle="modal" data-bs-target="#autoTr">Auto Trade</button>
-                    <button class="btn btn-sm btn-danger w-100 quit mt-2">Quit</button>
+                    <div class="btn-group w-100" role="group" aria-label="ctrl">
+                        <button class="btn btn-sm btn-danger me-1 quit mt-2">Quit</button>
+                        <button class="btn btn-sm btn-danger ms-1 shutdown mt-2">Shutdown</button>
+                    </div>
                 </div>
 
-                <button type="button" class="position-absolute btn btn-lg" style="top: 5px; right: 0" data-bs-toggle="modal" data-bs-target="#settings">
+                <button type="button" class="position-absolute btn btn-lg" style="top: 2%; right: 1%" data-bs-toggle="modal" data-bs-target="#settings">
                     <svg xmlns="http://www.w3.org/2000/svg" id="stn" aria-hidden="true" role="img" width="30px" height="30px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
                         <path
                             fill="currentColor"
@@ -386,7 +409,7 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="w-100">
-                                <h5 class="text-uppercase text-center my-2 text-danger"><span class="text-success">Wel</span>come</h5>
+                                <h5 class="text-uppercase text-center fw-bold my-2 text-danger"><span class="text-success fw-bold">Wel</span>come</h5>
                                 <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p>
                                 <form action="#" id="lgn" method="post">
                                     <div class="mb-3">
@@ -401,7 +424,7 @@
                                         <label for="server" class="form-label">Server:</label>
                                         <input type="text" class="form-control" id="server" placeholder="server" required />
                                     </div>
-                                    <div class="mb-2 mt-4 text-end">
+                                    <div class="mb-4 mt-4 text-end">
                                         <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100" id="bt1">Continue</button>
                                         <button type="button" class="btn btn-sm btn-dark px-4 w-100 hide" id="bt2" disabled>
                                             <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
@@ -421,7 +444,7 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="w-100">
-                                <h5 class="text-uppercase text-center my-2 text-danger">Settings</h5>
+                                <h5 class="text-uppercase text-center my-2 fw-bold text-danger">Settings</h5>
                                 <form action="#" id="apstg" method="post">
                                     <div class="mb-3">
                                         <label for="c_pairs" class="form-label">Pairs:</label>
@@ -480,19 +503,16 @@
                                 <!-- <p class="m-0 notifdd text-center text-decoration-none mt-2" style="font-size: 0.8rem"></p> -->
                                 <form action="#" id="atr" method="post">
                                     <div class="mb-3">
-                                        <label for="atr_lot" class="form-label">Lot:</label>
-                                        <input type="number" class="form-control" id="atr_lot" placeholder="0.0" min="0.1" step="any" required />
+                                        <label for="atr_tmp" class="form-label">Pattern:</label>
+                                        <select class="form-select form-select-lg" id="atr_tmp" aria-label=".form-select-lg" value="M15">
+                                            <option value="1">Instant (Buy & Sell)</option>
+                                            <option value="2">Pending (Buy Stop & Sell Stop)</option>
+                                            <option value="3">Double Trades (Instant)</option>
+                                            <option value="4">Double Trades (Pending)</option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="atr_pairs" class="form-label">Pair:</label>
-                                        <select class="form-select form-select-lg" id="atr_pairs" aria-label=".form-select-lg" value="Step Index"></select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="atr_tmp" class="form-label">Timeframe:</label>
-                                        <select class="form-select form-select-lg" id="atr_tmp" aria-label=".form-select-lg" value="M15"></select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="atr_ntr" class="form-label">Trades (min: 2):</label>
+                                        <label for="atr_ntr" class="form-label">No. of Trades (min: 2):</label>
                                         <input type="number" class="form-control" id="atr_ntr" placeholder="2" min="2" step="2" required />
                                     </div>
                                     <div class="mb-3 hide">
@@ -520,11 +540,9 @@
             const hideBtn = document.getElementById("btn-hide");
             const rightContainerEl = document.getElementById("right-container");
             const c_pairs = document.getElementById("c_pairs");
-            const atr_pairs = document.getElementById("atr_pairs");
             const timeframes = document.getElementById("timeframe");
             const timeframes_0 = document.getElementById("atr_tmp");
             const lot = document.getElementById("lot");
-            const atr_lot = document.getElementById("atr_lot");
             const atr_ntr = document.getElementById("atr_ntr");
             const sl = document.getElementById("stop_loss");
             const tp = document.getElementById("take_profit");
@@ -545,6 +563,7 @@
             const tbody_1 = document.getElementById("actv");
             const tbody_2 = document.getElementById("pndn");
             const quit = document.querySelector("button.quit");
+            const shutdown = document.querySelector("button.shutdown");
             const curr = document.getElementById("curr");
             const start_at = document.querySelector("button.atsm");
             const save_stn = document.querySelector("button.apsm");
@@ -567,7 +586,7 @@
             let today = new Date(Date.now());
             let chart = false;
 
-            // Form Submit
+            // Form Submit || Login
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const account = form.elements[0].value;
@@ -604,10 +623,13 @@
                     getPairs();
                     timeframe();
                     lot_size();
+                    _ntr();
+                    _ptn();
                     stop_loss();
                     take_profit();
                     deviation();
                     chart_display();
+                    trades();
                     buy_sell();
                     buy_Order();
                     buy_stop_Order();
@@ -616,10 +638,13 @@
                     double_instant_Order();
                     double_pending_Order();
                     close_app();
+                    shutdown_app();
 
                     setInterval(() => {
                         buy_sell();
-                    }, 500);
+                        chart_display();
+                        trades();
+                    }, 300);
 
                     if (defaultValues.autoTrade) {
                         submit_atr.classList.add("hide");
@@ -653,7 +678,8 @@
                         deviation: 20,
                         sl: 0.5,
                         tp: 100,
-                        ntr: 1,
+                        ntr: 2,
+                        ptn: "1",
                     };
 
                     localStorage.setItem("default", JSON.stringify(data));
@@ -677,7 +703,6 @@
                 }
 
                 c_pairs.innerHTML = options;
-                atr_pairs.innerHTML = options;
             };
 
             // Get Timeframes
@@ -694,7 +719,6 @@
                 }
 
                 timeframes.innerHTML = options;
-                timeframes_0.innerHTML = options;
             };
 
             // Get Lot Size
@@ -702,8 +726,27 @@
             const lot_size = () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 lot.value = defaultValues.lot;
-                atr_lot.value = defaultValues.lot;
+            };
+
+            // Get Number Of Trades
+            // ==============================================================================================
+            const _ntr = () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
                 atr_ntr.value = defaultValues.ntr;
+            };
+
+            // Get Pattern
+            // ==============================================================================================
+            const _ptn = () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const all_op = document.querySelectorAll("select#atr_tmp option");
+
+                for (const prop of all_op) {
+                    if (prop.value == defaultValues["ptn"]) {
+                        prop.setAttribute("selected", true);
+                        break;
+                    }
+                }
             };
 
             // Get stop loss
@@ -727,7 +770,7 @@
                 devtn.value = defaultValues.deviation;
             };
 
-            // Buy n Sell
+            // Buy n Sell {Bid n Ask Prices}
             // ==============================================================================================
             const buy_sell = async () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
@@ -775,7 +818,7 @@
                         textStyle: {
                             color: "#202a44",
                             fontName: "Inter",
-                            fontSize: 9,
+                            fontSize: 10,
                             bold: true,
                         },
                         slantedText: true,
@@ -792,16 +835,16 @@
                     },
                     vAxis: {
                         gridlines: {
-                            color: "#08697cf5",
+                            color: "#848482",
                             count: 10,
                         },
-                        // minorGridlines: {
-                        //    color: "transparent",
-                        // },
+                        minorGridlines: {
+                            color: "#848482",
+                        },
                         textStyle: {
                             color: "#202a44",
                             fontName: "Inter",
-                            fontSize: 9,
+                            fontSize: 10,
                             bold: true,
                         },
                         baselineColor: "red",
@@ -1446,17 +1489,6 @@
                 });
             };
 
-            // Quit App
-            // ==============================================================================================
-            const close_app = () => {
-                quit.addEventListener("click", () => {
-                    const defaultValues = JSON.parse(localStorage.getItem("default"));
-                    defaultValues.loggedin = false;
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
-                    location.reload();
-                });
-            };
-
             // Auto Trade
             // ==============================================================================================
             submit_atr.addEventListener("click", () => {
@@ -1465,13 +1497,13 @@
 
             fatr.addEventListener("submit", (e) => {
                 e.preventDefault();
-                const lot = e.target[0].value;
-                const pair = e.target[1].value;
-                const tmp = e.target[2].value;
-                const ntr = e.target[3].value;
+                const ptn = e.target[0].value;
+                const ntr = e.target[1].value;
 
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 defaultValues["autoTrade"] = true;
+                defaultValues["ntr"] = ntr;
+                defaultValues["ptn"] = ptn;
 
                 // Save
                 localStorage.setItem("default", JSON.stringify(defaultValues));
@@ -1486,6 +1518,7 @@
                     },
                     body: JSON.stringify({
                         ntr: ntr,
+                        ptn: ptn,
                     }),
                 });
             });
@@ -1556,6 +1589,35 @@
                 buy_sell();
             });
 
+            // Quit App
+            // ==============================================================================================
+            const close_app = () => {
+                quit.addEventListener("click", () => {
+                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                    defaultValues.loggedin = false;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+                    location.reload();
+                });
+            };
+
+            // Quit App
+            // ==============================================================================================
+            const shutdown_app = () => {
+                shutdown.addEventListener("click", async () => {
+                    // Send
+                    const response = await fetch("/shutdown", {
+                        method: "GET",
+                    });
+
+                    if ((await response).status === 200) {
+                        const defaultValues = JSON.parse(localStorage.getItem("default"));
+                        defaultValues.loggedin = false;
+                        localStorage.setItem("default", JSON.stringify(defaultValues));
+                        location.reload();
+                    }
+                });
+            };
+
             // Load App
             // ==============================================================================================
             window.onload = () => {
@@ -1564,10 +1626,13 @@
                     getPairs();
                     timeframe();
                     lot_size();
+                    _ntr();
+                    _ptn();
                     stop_loss();
                     take_profit();
                     deviation();
                     chart_display();
+                    trades();
                     buy_sell();
                     buy_Order();
                     buy_stop_Order();
@@ -1576,11 +1641,13 @@
                     double_instant_Order();
                     double_pending_Order();
                     close_app();
+                    shutdown_app();
 
                     setInterval(() => {
                         buy_sell();
                         chart_display();
-                    }, 500);
+                        trades();
+                    }, 300);
 
                     const defaultValues = JSON.parse(localStorage.getItem("default"));
                     if (defaultValues.autoTrade) {

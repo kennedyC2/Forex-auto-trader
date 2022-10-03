@@ -1,6 +1,5 @@
 # Import Dependencies
 # ==============================================================================
-from pickle import FALSE
 import MetaTrader5 as mt5
 import numpy
 import tulipy as tpy
@@ -157,9 +156,9 @@ class BBB:
     def Orders(self):
         positions = mt5.positions_get()
         orders = mt5.orders_get()
-        data = {}
-        data["positions"] = []
-        data["orders"] = []
+        _data = {}
+        _data["positions"] = []
+        _data["orders"] = []
         count = 0
 
         # Loop [Instant Orders]
@@ -175,7 +174,7 @@ class BBB:
             data["lot"] = prop.volume
             data["index"] = count
             data["type"] = "buy" if prop.type == 0 else "sell"
-            data["positions"].append(data)
+            _data["positions"].append(data)
             count = count + 1
 
         # Loop [Pending Orders]
@@ -190,9 +189,9 @@ class BBB:
             data["tp"] = prop.tp
             data["lot"] = prop.volume_current
             data["type"] = "buy_stop" if prop.type == 4 else "sell_stop"
-            data["orders"].append(data)
+            _data["orders"].append(data)
 
-        return data
+        return _data
 
     # Place Buy Order
     # ===================================================================================
@@ -221,7 +220,7 @@ class BBB:
         if response.retcode != mt5.TRADE_RETCODE_DONE:
             return {"status": False, "message": response.comment}
         else:
-            return {"status": True}
+            return {"status": True, "message": self.Orders()}
 
     # Place Buy_Stop Order
     # ===================================================================================
@@ -279,7 +278,7 @@ class BBB:
         if response.retcode != mt5.TRADE_RETCODE_DONE:
             return {"status": False, "message": response.comment}
         else:
-            return {"status": True}
+            return {"status": True, "message": self.Orders()}
 
     # Place Sell_Stop Order
     # ===================================================================================
@@ -628,7 +627,7 @@ class BBB:
     # Auto Trader 1
     # ============================================================================
 
-    def auto_T1(self, price, no_of_trades):
+    def auto_T1(self, price, no_of_trades, pattern):
         # Update Status
         self.bot_S["active"] = True
 
@@ -641,27 +640,44 @@ class BBB:
 
             # Check If Current Price Is Either 5 pips below or 5 pips above
             if info["ask"] - price <= 0.5 or price - info["ask"] <= 0.5:
-                self.Instant_Sell_Order(info["ask"])
+                # Define variable
+                order = None
 
-                # Update Last Traded Ask Price
-                self.bot_S["price"] = info["ask"]
+                # Place Order
+                if int(pattern) == 1:
+                    order = self.Instant_Sell_Order(info["ask"])
 
-                # Update Number of Positions Opened
-                self.bot_S["trades"] += 1
+                if int(pattern) == 2:
+                    order = self.Sell_Stop_Order(info["ask"])
+
+                if int(pattern) == 3:
+                    order = self.Double_Instant_Order(
+                        (info["ask"] + info["bid"]) / 2)
+
+                if int(pattern) == 4:
+                    order = self.Double_Pending_Order(
+                        (info["ask"] + info["bid"]) / 2)
+
+                if order["status"]:
+                    # Update Last Traded Ask Price
+                    self.bot_S["price"] = info["ask"]
+
+                    # Update Number of Positions Opened
+                    self.bot_S["trades"] += 1
 
                 # Update Status
                 self.bot_S["active"] = False
 
                 # Return
-                return
+                return order
 
             # Wait
-            sleep(5)
+            sleep(10)
 
     # Auto Trader 2
     # ============================================================================
 
-    def auto_T2(self, price, no_of_trades):
+    def auto_T2(self, price, no_of_trades, pattern):
         # Update Status
         self.bot_B["active"] = True
 
@@ -674,27 +690,44 @@ class BBB:
 
             # Check If Current Price Is Either 5 pips below or 5 pips above
             if info["bid"] - price <= 0.5 or price - info["bid"] <= 0.5:
-                self.Instant_Buy_Order(info["bid"])
+                # Define variable
+                order = None
 
-                # Update Last Traded Bid Price
-                self.bot_B["price"] = info["bid"]
+                # Place Order
+                if int(pattern) == 1:
+                    order = self.Instant_Buy_Order(info["bid"])
 
-                # Update Number of Positions Opened
-                self.bot_B["trades"] += 1
+                if int(pattern) == 2:
+                    order = self.Buy_Stop_Order(info["bid"])
+
+                if int(pattern) == 3:
+                    order = self.Double_Instant_Order(
+                        (info["ask"] + info["bid"]) / 2)
+
+                if int(pattern) == 4:
+                    order = self.Double_Pending_Order(
+                        (info["ask"] + info["bid"]) / 2)
+
+                if order["status"]:
+                    # Update Last Traded Bid Price
+                    self.bot_B["price"] = info["bid"]
+
+                    # Update Number of Positions Opened
+                    self.bot_B["trades"] += 1
 
                 # Update Status
                 self.bot_B["active"] = False
 
                 # Return
-                return
+                return order
 
             # Wait
-            sleep(5)
+            sleep(10)
 
     # Start Auto Trading
     # ============================================================================
 
-    def start_auto(self, no_of_trades):
+    def start_auto(self, no_of_trades, pattern):
         # Get Existing Orders
         orders = mt5.positions_get()
 
@@ -707,7 +740,6 @@ class BBB:
                     self.bot_S["trades"] += 1
 
         while self.auto_trade:
-            print("RSI current value is", self.rsi)
             # Check RSI
             if self.rsi > 0:
                 # Get Current Tick Info
@@ -719,15 +751,15 @@ class BBB:
                     if info["ask"] in self.H_H and self.bot_B["trades"] < int(no_of_trades) / 2 and not self.bot_S["active"]:
                         if info["ask"] - self.bot_B["price"] > 0.3 and self.rsi >= 65:
                             s_a1 = threading.Thread(target=self.auto_T1, args=(
-                                info["ask"], no_of_trades,), daemon=False)
+                                info["ask"], no_of_trades, pattern,), daemon=False)
                             s_a1.start()
 
                     # Start LP Monitor
                     if info["bid"] in self.L_L and self.bot_S["trades"] < int(no_of_trades) / 2 and not self.bot_B["active"]:
                         if self.bot_S["price"] - info["bid"] > 0.3 and self.rsi <= 35:
                             s_a2 = threading.Thread(target=self.auto_T2, args=(
-                                info["bid"], no_of_trades,), daemon=False)
+                                info["bid"], no_of_trades, pattern,), daemon=False)
                             s_a2.start()
 
             # Wait
-            sleep(10)
+            sleep(20)

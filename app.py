@@ -39,8 +39,8 @@ def auth():
         # Send Response If Successfully logged In
         if account["status"]:
             # Set kick
-            # Trader.run_rt = True
-            # Trader.track = True
+            Trader.run_rt = True
+            Trader.track = True
 
             # Trade Tracker Thread
             global t_trade
@@ -418,7 +418,7 @@ def trade_start():
         # Start Thread
         global s_thread
         s_thread = threading.Thread(target=Trader.start_auto, args=(
-            data["ntr"],), daemon=False)
+            data["ntr"], data["ptn"]), daemon=False)
 
         s_thread.start()
 
@@ -473,14 +473,6 @@ def settings():
         # start Fetcher and RSI Calculator
         Trader.run_rt = True
 
-        # RSI Thread
-        s_RSI = threading.Thread(
-            target=Trader.c_RSI, args=(), daemon=False)
-
-        # Fetcher Thread
-        s_fetcher = threading.Thread(
-            target=Trader.fetcher, args=(), daemon=False)
-
         # Start RSI Thread
         s_RSI.start()
 
@@ -488,6 +480,27 @@ def settings():
         s_fetcher.start()
 
         # Send Response
+        response = make_response(
+            jsonify(
+                {"message": "success"}
+            ),
+            200,
+        )
+        response.headers["Content-Type"] = "application/json"
+        return response
+    return
+
+# Shutdown
+# ==============================================================================
+
+
+@app.route("/shutdown", methods=["GET"])
+def shutdown():
+    if request.method == "GET":
+        Trader.auto_trade = False
+        Trader.run_rt = False
+        Trader.track = False
+
         response = make_response(
             jsonify(
                 {"message": "success"}
