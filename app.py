@@ -32,12 +32,18 @@ def auth():
         data = request.get_json(force=True)
 
         # Instantiate BBB
-        Trader = BBB(data["account"], data["password"], data["server"], data["pair"],
-                     data["timeframe"], data["lot"], data["sl"], data["tp"], data["deviation"])
+        Trader = BBB(
+            data["account"], data["password"], data["server"], data["timeframe"], data["lot"], data["sl"], data["tp"], data["deviation"])
         account = Trader.Connect()
 
         # Send Response If Successfully logged In
         if account["status"]:
+            # Get Pair
+            pairs = Trader.Get_Currency_Pairs()
+
+            # Set Pair
+            Trader.pair = pairs[0]
+
             # Set kick
             Trader.run_rt = True
             Trader.track = True
@@ -68,7 +74,7 @@ def auth():
 
             response = make_response(
                 jsonify(
-                    {"message": account["message"]}
+                    {"message": account["message"], "pair": Trader.pair}
                 ),
                 200,
             )
@@ -472,6 +478,14 @@ def settings():
 
         # start Fetcher and RSI Calculator
         Trader.run_rt = True
+
+        # RSI Thread
+        s_RSI = threading.Thread(
+            target=Trader.c_RSI, args=(), daemon=False)
+
+        # Fetcher Thread
+        s_fetcher = threading.Thread(
+            target=Trader.fetcher, args=(), daemon=False)
 
         # Start RSI Thread
         s_RSI.start()

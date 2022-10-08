@@ -12,7 +12,7 @@ import threading
 #                               Class Object
 # ==============================================================================
 class BBB:
-    def __init__(self, account, password, server, pair, timeframe, lot, sl, tp, deviation):
+    def __init__(self, account, password, server, timeframe, lot, sl, tp, deviation):
         self.Account = int(account)
         self.Password = password
         self.Server = server
@@ -44,7 +44,7 @@ class BBB:
         self.L_L = set()
 
         # Settings
-        self.pair = pair
+        self.pair = False
         self.timeframe = timeframe
         self.lot = lot
         self.sl = sl

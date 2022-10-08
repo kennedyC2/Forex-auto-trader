@@ -540,6 +540,7 @@
             const hideBtn = document.getElementById("btn-hide");
             const rightContainerEl = document.getElementById("right-container");
             const c_pairs = document.getElementById("c_pairs");
+            let defaultPair = "Step Index";
             const timeframes = document.getElementById("timeframe");
             const timeframes_0 = document.getElementById("atr_tmp");
             const lot = document.getElementById("lot");
@@ -593,7 +594,7 @@
                 const password = form.elements[1].value;
                 const server = form.elements[2].value;
 
-                const response = fetch("/auth", {
+                const response = await fetch("/auth", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -602,7 +603,6 @@
                         account: account,
                         password: password,
                         server: server,
-                        pair: "Step Index",
                         timeframe: "M15",
                         lot: 0.2,
                         deviation: 20,
@@ -614,8 +614,12 @@
                 bt1.classList.add("hide");
                 bt2.classList.remove("hide");
 
-                if ((await response).status === 200) {
-                    const defaultValues = JSON.parse(localStorage.getItem("default"));
+                const received = await response.json();
+
+                if (received.message == "success") {
+                    // Update Default pair
+                    defaultPair = received.pair;
+                    const defaultValues = JSON.parse(localStorage.getItem("default")) || { autoTrade: false };
 
                     // Start App
                     loggedin = true;
@@ -653,8 +657,7 @@
 
                     box_l.hide();
                 } else {
-                    const data = await (await response).json();
-                    notifdd.innerHTML = data.message[1].split(":")[1];
+                    notifdd.innerHTML = received.message[1].split(":")[1];
                     bt1.classList.remove("hide");
                     bt2.classList.add("hide");
 
@@ -666,13 +669,13 @@
 
             // Initialize Default Values
             // ==============================================================================================
-            const setDefault = async () => {
+            const setDefault = async (justLogged) => {
                 const defaultValues = JSON.parse(localStorage.getItem("default")) || false;
 
-                if (!defaultValues) {
+                if (justLogged && !defaultValues) {
                     const data = {
                         loggedin: true,
-                        pair: "Step Index",
+                        pair: defaultPair,
                         timeframe: "M15",
                         lot: 0.2,
                         deviation: 20,
@@ -680,13 +683,23 @@
                         tp: 100,
                         ntr: 2,
                         ptn: "1",
+                        autoTrade: false,
                     };
 
                     localStorage.setItem("default", JSON.stringify(data));
-                } else {
-                    defaultValues.loggedin = true;
-                    localStorage.setItem("default", JSON.stringify(defaultValues));
+
+                    return;
                 }
+
+                if (justLogged && defaultValues) {
+                    defaultValues.loggedin = true;
+                    defaultValues.pair = defaultPair;
+                    localStorage.setItem("default", JSON.stringify(defaultValues));
+
+                    return;
+                }
+
+                return;
             };
 
             // Get Currency Pairs
