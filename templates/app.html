@@ -366,7 +366,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="mb-2">
                     <p class="text-center uline">Double Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
@@ -384,10 +384,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="ps-2 pt-2 text-uppercase fw-bold d-lg-none" style="font-size: 14px" id="curr2"></div>
                 <div class="position-absolute" style="bottom: 3%; width: calc(100% - 2rem)">
                     <button type="button" class="btn btn-sm w-100 btn-success" data-bs-toggle="modal" data-bs-target="#autoTr">Auto Trade</button>
                     <div class="btn-group w-100" role="group" aria-label="ctrl">
-                        <button class="btn btn-sm btn-danger me-1 quit mt-2">Quit</button>
+                        <button class="btn btn-sm btn-danger me-1 quit mt-2 d-none">Quit</button>
                         <button class="btn btn-sm btn-danger ms-1 shutdown mt-2">Shutdown</button>
                     </div>
                 </div>
@@ -540,7 +541,6 @@
             const hideBtn = document.getElementById("btn-hide");
             const rightContainerEl = document.getElementById("right-container");
             const c_pairs = document.getElementById("c_pairs");
-            let defaultPair = "Step Index";
             const timeframes = document.getElementById("timeframe");
             const timeframes_0 = document.getElementById("atr_tmp");
             const lot = document.getElementById("lot");
@@ -566,6 +566,7 @@
             const quit = document.querySelector("button.quit");
             const shutdown = document.querySelector("button.shutdown");
             const curr = document.getElementById("curr");
+            const curr2 = document.getElementById("curr2");
             const start_at = document.querySelector("button.atsm");
             const save_stn = document.querySelector("button.apsm");
             const submit_stn = document.querySelector("button.substn");
@@ -586,6 +587,8 @@
             let { loggedin } = JSON.parse(localStorage.getItem("default")) || false;
             let today = new Date(Date.now());
             let chart = false;
+            let defaultPair = "Step Index";
+            let autoTr;
 
             // Form Submit || Login
             form.addEventListener("submit", async (e) => {
@@ -593,6 +596,7 @@
                 const account = form.elements[0].value;
                 const password = form.elements[1].value;
                 const server = form.elements[2].value;
+                const defaultValues = JSON.parse(localStorage.getItem("default")) || { autoTrade: false, pair: "Step Index" };
 
                 const response = await fetch("/auth", {
                     method: "POST",
@@ -603,6 +607,7 @@
                         account: account,
                         password: password,
                         server: server,
+                        pair: defaultValues.pair.replaceAll("_", " "),
                         timeframe: "M15",
                         lot: 0.2,
                         deviation: 20,
@@ -617,13 +622,13 @@
                 const received = await response.json();
 
                 if (received.message == "success") {
-                    // Update Default pair
+                    // Update Default pair n autotrade status
                     defaultPair = received.pair;
-                    const defaultValues = JSON.parse(localStorage.getItem("default")) || { autoTrade: false };
+                    autoTr = received.atr;
 
                     // Start App
                     loggedin = true;
-                    setDefault();
+                    setDefault(true);
                     getPairs();
                     timeframe();
                     lot_size();
@@ -632,7 +637,7 @@
                     stop_loss();
                     take_profit();
                     deviation();
-                    chart_display();
+                    set_details();
                     trades();
                     buy_sell();
                     buy_Order();
@@ -644,16 +649,26 @@
                     close_app();
                     shutdown_app();
 
+                    if (screen.width >= 992) {
+                        chart_display();
+                    }
+
                     setInterval(() => {
                         buy_sell();
-                        chart_display();
                         trades();
+                        set_details();
+
+                        if (screen.width >= 992) {
+                            chart_display();
+                        }
                     }, 300);
 
-                    if (defaultValues.autoTrade) {
+                    if (autoTr) {
                         submit_atr.classList.add("hide");
                         notf_atr.classList.remove("hide");
                     }
+
+                    console.log(autoTr);
 
                     box_l.hide();
                 } else {
@@ -683,7 +698,7 @@
                         tp: 100,
                         ntr: 2,
                         ptn: "1",
-                        autoTrade: false,
+                        autoTrade: autoTr,
                     };
 
                     localStorage.setItem("default", JSON.stringify(data));
@@ -694,6 +709,7 @@
                 if (justLogged && defaultValues) {
                     defaultValues.loggedin = true;
                     defaultValues.pair = defaultPair;
+                    defaultValues.autoTrade = autoTr;
                     localStorage.setItem("default", JSON.stringify(defaultValues));
 
                     return;
@@ -781,6 +797,22 @@
             const deviation = () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 devtn.value = defaultValues.deviation;
+            };
+
+            // Set Details
+            // ==============================================================================================
+            const set_details = async () => {
+                const defaultValues = JSON.parse(localStorage.getItem("default"));
+
+                // Send Request
+                const response = await fetch("/rsi", {
+                    method: "GET",
+                });
+
+                const _data = await response.json();
+
+                curr.innerHTML = `${defaultValues.pair.replaceAll("_", " ")} [${defaultValues.timeframe}], RSI: ${parseFloat(_data)}`;
+                curr2.innerHTML = `${defaultValues.pair.replaceAll("_", " ")} [${defaultValues.timeframe}], RSI: ${parseFloat(_data)}`;
             };
 
             // Buy n Sell {Bid n Ask Prices}
@@ -884,7 +916,6 @@
                 });
 
                 const _data = await response.json();
-                curr.innerHTML = `${defaultValues.pair.replaceAll("_", " ")} [${defaultValues.timeframe}]`;
                 google.charts.setOnLoadCallback(drawChart(_data));
             };
 
@@ -1625,6 +1656,7 @@
                     if ((await response).status === 200) {
                         const defaultValues = JSON.parse(localStorage.getItem("default"));
                         defaultValues.loggedin = false;
+                        defaultValues.autoTrade = false;
                         localStorage.setItem("default", JSON.stringify(defaultValues));
                         location.reload();
                     }
@@ -1635,7 +1667,7 @@
             // ==============================================================================================
             window.onload = () => {
                 if (loggedin) {
-                    setDefault();
+                    setDefault(false);
                     getPairs();
                     timeframe();
                     lot_size();
@@ -1644,7 +1676,7 @@
                     stop_loss();
                     take_profit();
                     deviation();
-                    chart_display();
+                    set_details();
                     trades();
                     buy_sell();
                     buy_Order();
@@ -1656,10 +1688,18 @@
                     close_app();
                     shutdown_app();
 
+                    if (screen.width >= 992) {
+                        chart_display();
+                    }
+
                     setInterval(() => {
                         buy_sell();
-                        chart_display();
                         trades();
+                        set_details();
+
+                        if (screen.width >= 992) {
+                            chart_display();
+                        }
                     }, 300);
 
                     const defaultValues = JSON.parse(localStorage.getItem("default"));

@@ -12,7 +12,7 @@ import threading
 #                               Class Object
 # ==============================================================================
 class BBB:
-    def __init__(self, account, password, server, timeframe, lot, sl, tp, deviation):
+    def __init__(self, account, password, server, lot, sl, tp, deviation):
         self.Account = int(account)
         self.Password = password
         self.Server = server
@@ -45,7 +45,7 @@ class BBB:
 
         # Settings
         self.pair = False
-        self.timeframe = timeframe
+        self.timeframe = False
         self.lot = lot
         self.sl = sl
         self.tp = tp
@@ -76,11 +76,23 @@ class BBB:
 
     # Initialize MetaTrader 5 n Log Client In
     # ==========================================
-    def Connect(self):
+    def Connect(self, pair, timeframe):
         if self.Account and self.Password and self.Server:
             if not mt5.initialize(path="C:/Program Files/MetaTrader 5/terminal64.exe", login=self.Account, password=self.Password, server=self.Server, timeout=60000, portable=False):
                 return {"status": False, "message": mt5.last_error()}
             else:
+                # Get Pairs
+                pairs = self.Get_Currency_Pairs()
+
+                # Check Pairs
+                if pair in pairs:
+                    self.pair = pair
+                else:
+                    self.pair = pairs[0]
+
+                if not self.timeframe:
+                    self.timeframe = timeframe
+
                 # Return
                 return {"status": True, "message": "success"}
 
@@ -471,10 +483,10 @@ class BBB:
             for i in range(1440):
                 cpArr.append(data[i][4])
 
-            self.rsi = tpy.rsi(numpy.array(cpArr), 14)[-1]
+            self.rsi = round(tpy.rsi(numpy.array(cpArr), 14)[-1], 2)
 
             # Wait
-            sleep(5)
+            sleep(3)
 
     # Track Trade
     # ============================================================================
@@ -627,7 +639,7 @@ class BBB:
     # Auto Trader 1
     # ============================================================================
 
-    def auto_T1(self, price, no_of_trades, pattern):
+    def auto_T1(self, no_of_trades, pattern):
         # Update Status
         self.bot_S["active"] = True
 
@@ -638,41 +650,36 @@ class BBB:
             # Get Current Tick Info
             info = (mt5.symbol_info(self.pair))._asdict()
 
-            # Check If Current Price Is Either 5 pips below or 5 pips above
-            if info["ask"] - price <= 0.5 or price - info["ask"] <= 0.5:
-                # Define variable
-                order = None
+            # Define variable
+            order = None
 
-                # Place Order
-                if int(pattern) == 1:
-                    order = self.Instant_Sell_Order(info["ask"])
+            # Place Order
+            if int(pattern) == 1:
+                order = self.Instant_Sell_Order(info["ask"])
 
-                if int(pattern) == 2:
-                    order = self.Sell_Stop_Order(info["ask"])
+            if int(pattern) == 2:
+                order = self.Sell_Stop_Order(info["ask"])
 
-                if int(pattern) == 3:
-                    order = self.Double_Instant_Order(
-                        (info["ask"] + info["bid"]) / 2)
+            if int(pattern) == 3:
+                order = self.Double_Instant_Order(
+                    (info["ask"] + info["bid"]) / 2)
 
-                if int(pattern) == 4:
-                    order = self.Double_Pending_Order(
-                        (info["ask"] + info["bid"]) / 2)
+            if int(pattern) == 4:
+                order = self.Double_Pending_Order(
+                    (info["ask"] + info["bid"]) / 2)
 
-                if order["status"]:
-                    # Update Last Traded Ask Price
-                    self.bot_S["price"] = info["ask"]
+            if order["status"]:
+                # Update Last Traded Ask Price
+                self.bot_S["price"] = info["ask"]
 
-                    # Update Number of Positions Opened
-                    self.bot_S["trades"] += 1
+                # Update Number of Positions Opened
+                self.bot_S["trades"] += 1
 
-                # Update Status
-                self.bot_S["active"] = False
+            # Update Status
+            self.bot_S["active"] = False
 
-                # Return
-                return order
-
-            # Wait
-            sleep(10)
+            # Return
+            return order
 
     # Auto Trader 2
     # ============================================================================
@@ -687,49 +694,54 @@ class BBB:
         while self.bot_B["trades"] < int(no_of_trades) / 2:
             # Get Current Tick Info
             info = (mt5.symbol_info(self.pair))._asdict()
+            # Define variable
+            order = None
 
-            # Check If Current Price Is Either 5 pips below or 5 pips above
-            if info["bid"] - price <= 0.5 or price - info["bid"] <= 0.5:
-                # Define variable
-                order = None
+            # Place Order
+            if int(pattern) == 1:
+                order = self.Instant_Buy_Order(info["bid"])
 
-                # Place Order
-                if int(pattern) == 1:
-                    order = self.Instant_Buy_Order(info["bid"])
+            if int(pattern) == 2:
+                order = self.Buy_Stop_Order(info["bid"])
 
-                if int(pattern) == 2:
-                    order = self.Buy_Stop_Order(info["bid"])
+            if int(pattern) == 3:
+                order = self.Double_Instant_Order(
+                    (info["ask"] + info["bid"]) / 2)
 
-                if int(pattern) == 3:
-                    order = self.Double_Instant_Order(
-                        (info["ask"] + info["bid"]) / 2)
+            if int(pattern) == 4:
+                order = self.Double_Pending_Order(
+                    (info["ask"] + info["bid"]) / 2)
 
-                if int(pattern) == 4:
-                    order = self.Double_Pending_Order(
-                        (info["ask"] + info["bid"]) / 2)
+            if order["status"]:
+                # Update Last Traded Bid Price
+                self.bot_B["price"] = info["bid"]
 
-                if order["status"]:
-                    # Update Last Traded Bid Price
-                    self.bot_B["price"] = info["bid"]
+                # Update Number of Positions Opened
+                self.bot_B["trades"] += 1
 
-                    # Update Number of Positions Opened
-                    self.bot_B["trades"] += 1
+            # Update Status
+            self.bot_B["active"] = False
 
-                # Update Status
-                self.bot_B["active"] = False
-
-                # Return
-                return order
-
-            # Wait
-            sleep(10)
+            # Return
+            return order
 
     # Start Auto Trading
     # ============================================================================
 
     def start_auto(self, no_of_trades, pattern):
-        # Get Existing Orders
-        orders = mt5.positions_get()
+        # Get Open Positions
+        positions = mt5.positions_get()
+
+        # Get Open Orders
+        orders = mt5.orders_get()
+
+        if len(positions) > 0:
+            # Update Counter
+            for prop in positions:
+                if prop.type == 0:
+                    self.bot_B["trades"] += 1
+                else:
+                    self.bot_S["trades"] += 1
 
         if len(orders) > 0:
             # Update Counter
@@ -747,19 +759,21 @@ class BBB:
 
                 # Check If Database Has Been Updated And Number Of Existing Orders Are Not Greater Than Required
                 if len(self.H_H) > 0 and len(self.L_L) > 0:
-                    # Start HP Monitor
-                    if info["ask"] in self.H_H and self.bot_B["trades"] < int(no_of_trades) / 2 and not self.bot_S["active"]:
-                        if info["ask"] - self.bot_B["price"] > 0.3 and self.rsi >= 65:
-                            s_a1 = threading.Thread(target=self.auto_T1, args=(
-                                info["ask"], no_of_trades, pattern,), daemon=False)
-                            s_a1.start()
+                    if (info["ask"] - self.bot_B["price"] > 0.3 and self.rsi >= 65) or (self.bot_B["price"] - info["ask"] > 0.3 and self.rsi >= 65):
+                        for i in range(1, 6):
+                            # Check HP
+                            if (info["ask"] - (i/10) in self.H_H and not self.bot_S["active"]) or (info["ask"] + (i/10) in self.H_H and not self.bot_S["active"]):
+                                s_a1 = threading.Thread(target=self.auto_T1, args=(
+                                    info["ask"], no_of_trades, pattern,), daemon=False)
+                                s_a1.start()
 
-                    # Start LP Monitor
-                    if info["bid"] in self.L_L and self.bot_S["trades"] < int(no_of_trades) / 2 and not self.bot_B["active"]:
-                        if self.bot_S["price"] - info["bid"] > 0.3 and self.rsi <= 35:
-                            s_a2 = threading.Thread(target=self.auto_T2, args=(
-                                info["bid"], no_of_trades, pattern,), daemon=False)
-                            s_a2.start()
+                    if (self.bot_S["price"] - info["bid"] > 0.3 and self.rsi <= 35) or (info["bid"] - self.bot_S["price"] > 0.3 and self.rsi <= 35):
+                        for i in range(1, 6):
+                            # Check LP
+                            if (info["bid"] - (i/10) in self.L_L and not self.bot_B["active"]) or (info["bid"] + (i/10) in self.L_L and not self.bot_B["active"]):
+                                s_a2 = threading.Thread(target=self.auto_T2, args=(
+                                    info["bid"], no_of_trades, pattern,), daemon=False)
+                                s_a2.start()
 
             # Wait
-            sleep(20)
+            sleep(5)

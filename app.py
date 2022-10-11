@@ -33,17 +33,11 @@ def auth():
 
         # Instantiate BBB
         Trader = BBB(
-            data["account"], data["password"], data["server"], data["timeframe"], data["lot"], data["sl"], data["tp"], data["deviation"])
-        account = Trader.Connect()
+            data["account"], data["password"], data["server"], data["lot"], data["sl"], data["tp"], data["deviation"])
+        account = Trader.Connect(data["pair"], data["timeframe"])
 
         # Send Response If Successfully logged In
         if account["status"]:
-            # Get Pair
-            pairs = Trader.Get_Currency_Pairs()
-
-            # Set Pair
-            Trader.pair = pairs[0]
-
             # Set kick
             Trader.run_rt = True
             Trader.track = True
@@ -74,7 +68,8 @@ def auth():
 
             response = make_response(
                 jsonify(
-                    {"message": account["message"], "pair": Trader.pair}
+                    {"message": account["message"],
+                        "pair": Trader.pair, "atr": Trader.auto_trade}
                 ),
                 200,
             )
@@ -127,6 +122,15 @@ def chartData():
 def bid_ask():
     if request.method == "GET":
         return jsonify(Trader.Get_Currency_Pair_Info())
+    return
+
+
+# Get RSI
+# ==============================================================================
+@app.route("/rsi", methods=["GET"])
+def rsi():
+    if request.method == "GET":
+        return jsonify(Trader.rsi)
     return
 
 
