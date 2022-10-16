@@ -4,6 +4,8 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex" />
+        <meta name="googlebot" content="noindex" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
         <title>PHANTOM</title>
         <style>
@@ -74,6 +76,10 @@
                 padding-left: 1rem !important;
             }
 
+            .btn {
+                font-size: 0.93rem !important;
+            }
+
             .hide {
                 display: none;
             }
@@ -106,13 +112,13 @@
 
             .uline::after {
                 content: " ";
-                width: 8.5rem;
+                width: 9rem;
                 height: 0;
                 border: 1px solid #202a44;
                 background-color: #202a44;
                 position: absolute;
                 top: 1.3rem;
-                right: calc((100% - 8.5rem) / 2);
+                right: calc((100% - 9rem) / 2);
                 transform: rotate(0);
             }
 
@@ -154,7 +160,7 @@
             }
 
             p {
-                font-size: 1rem;
+                font-size: 1.1rem;
                 /* text-decoration: underline; */
             }
 
@@ -328,7 +334,7 @@
                 </div>
             </div>
             <div class="right-container h-100 px-3 py-3 position-relative" id="right-container">
-                <div style="margin-top: 15%">
+                <div style="margin-top: 10%">
                     <p class="text-center uline">Instant Trading</p>
                     <div class="d-flex justify-content-between">
                         <div style="width: 47%">
@@ -384,13 +390,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="ps-2 pt-2 text-uppercase fw-bold d-lg-none" style="font-size: 14px" id="curr2"></div>
+                <div class="pt-3 text-uppercase fw-bold d-lg-none" style="font-size: 14px" id="curr2"></div>
                 <div class="position-absolute" style="bottom: 3%; width: calc(100% - 2rem)">
                     <button type="button" class="btn btn-sm w-100 btn-success" data-bs-toggle="modal" data-bs-target="#autoTr">Auto Trade</button>
-                    <div class="btn-group w-100" role="group" aria-label="ctrl">
-                        <button class="btn btn-sm btn-danger me-1 quit mt-2 d-none">Quit</button>
-                        <button class="btn btn-sm btn-danger ms-1 shutdown mt-2">Shutdown</button>
-                    </div>
+                    <button class="btn btn-sm w-100 btn-danger shutdown mt-2">Shutdown</button>
                 </div>
 
                 <button type="button" class="position-absolute btn btn-lg" style="top: 2%; right: 1%" data-bs-toggle="modal" data-bs-target="#settings">
@@ -445,7 +448,7 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="w-100">
-                                <h5 class="text-uppercase text-center my-2 fw-bold text-danger">Settings</h5>
+                                <h5 class="text-uppercase text-center my-3 fw-bold text-danger">Settings</h5>
                                 <form action="#" id="apstg" method="post">
                                     <div class="mb-3">
                                         <label for="c_pairs" class="form-label">Pairs:</label>
@@ -516,6 +519,14 @@
                                         <label for="atr_ntr" class="form-label">No. of Trades (min: 2):</label>
                                         <input type="number" class="form-control" id="atr_ntr" placeholder="2" min="2" step="2" required />
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="gmt" class="form-label">Gain limit(min: 2):</label>
+                                        <input type="number" class="form-control" id="gmt" placeholder="2" min="2" step="1" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="lmt" class="form-label">Loss limit (min: 2):</label>
+                                        <input type="number" class="form-control" id="lmt" placeholder="2" min="2" step="1" required />
+                                    </div>
                                     <div class="mb-3 hide">
                                         <button type="submit" class="btn btn-sm btn-outline-dark px-4 w-100 atsm">Continue</button>
                                     </div>
@@ -554,6 +565,8 @@
             const isell = document.getElementById("isell");
             const itr = document.getElementById("itr");
             const ditr = document.getElementById("ditr");
+            const dlmt = document.getElementById("lmt");
+            const dgmt = document.getElementById("gmt");
             const fbuy = document.querySelector("form#fbuy");
             const fsell = document.querySelector("form#fsell");
             const fsbuy = document.querySelector("form#fsbuy");
@@ -646,7 +659,7 @@
                     sell_stop_Order();
                     double_instant_Order();
                     double_pending_Order();
-                    close_app();
+                    // close_app();
                     shutdown_app();
 
                     if (screen.width >= 992) {
@@ -667,8 +680,6 @@
                         submit_atr.classList.add("hide");
                         notf_atr.classList.remove("hide");
                     }
-
-                    console.log(autoTr);
 
                     box_l.hide();
                 } else {
@@ -699,6 +710,8 @@
                         ntr: 2,
                         ptn: "1",
                         autoTrade: autoTr,
+                        lmt: 10,
+                        gmt: 5,
                     };
 
                     localStorage.setItem("default", JSON.stringify(data));
@@ -710,6 +723,13 @@
                     defaultValues.loggedin = true;
                     defaultValues.pair = defaultPair;
                     defaultValues.autoTrade = autoTr;
+
+                    // Delete this line on next update
+                    if (!defaultValues.lmt || !defaultValues.gmt) {
+                        defaultValues.lmt = 10;
+                        defaultValues.gmt = 5;
+                    }
+
                     localStorage.setItem("default", JSON.stringify(defaultValues));
 
                     return;
@@ -755,6 +775,8 @@
             const lot_size = () => {
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 lot.value = defaultValues.lot;
+                dlmt.value = defaultValues.lmt;
+                dgmt.value = defaultValues.gmt;
             };
 
             // Get Number Of Trades
@@ -1543,11 +1565,15 @@
                 e.preventDefault();
                 const ptn = e.target[0].value;
                 const ntr = e.target[1].value;
+                const lmt = e.target[3].value;
+                const gmt = e.target[2].value;
 
                 const defaultValues = JSON.parse(localStorage.getItem("default"));
                 defaultValues["autoTrade"] = true;
                 defaultValues["ntr"] = ntr;
                 defaultValues["ptn"] = ptn;
+                defaultValues["lmt"] = lmt;
+                defaultValues["gmt"] = gmt;
 
                 // Save
                 localStorage.setItem("default", JSON.stringify(defaultValues));
@@ -1563,6 +1589,8 @@
                     body: JSON.stringify({
                         ntr: ntr,
                         ptn: ptn,
+                        lmt: lmt,
+                        gmt: gmt,
                     }),
                 });
             });
@@ -1685,7 +1713,7 @@
                     sell_stop_Order();
                     double_instant_Order();
                     double_pending_Order();
-                    close_app();
+                    // close_app();
                     shutdown_app();
 
                     if (screen.width >= 992) {

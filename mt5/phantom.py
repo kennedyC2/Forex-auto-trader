@@ -51,6 +51,8 @@ class BBB:
         self.tp = tp
         self.deviation = deviation
         self.magic = 112026457
+        self.lmt = 10
+        self.gmt = 5
 
         # BOTS
         self.bot_B = {
@@ -504,7 +506,7 @@ class BBB:
                     if prop.ticket in self.items:
                         # Check If In Loss And If Current Loss Is 2 Pips Or Greater, Below 0.
                         # If Requirements Meet, Close Trade.
-                        if prop.profit <= (0 - (2 * prop.volume)):
+                        if prop.profit <= (0 - (self.lmt * prop.volume)):
                             # Instantiate Request Object
                             request = {
                                 "action": mt5.TRADE_ACTION_DEAL,
@@ -530,7 +532,7 @@ class BBB:
                                 self.bot_S["trades"] -= 1
 
                         # If Current Trade Has maintained a Low Profit 5 Consecutive Times, End Trade
-                        if self.items[prop.ticket] >= 3:
+                        if self.items[prop.ticket] - prop.profit >= (self.gmt * prop.volume):
                             # Instantiate Request Object
                             request = {
                                 "action": mt5.TRADE_ACTION_DEAL,
@@ -557,8 +559,8 @@ class BBB:
                                 self.bot_S["trades"] -= 1
 
                         # If Current Profit On Order Is Not Incrementing, Update count
-                        if prop.profit > 0 and prop.profit < (3 * prop.volume):
-                            self.items[prop.ticket] += 1
+                        if prop.profit > self.items["prop.ticket"]:
+                            self.items[prop.ticket] = prop.profit
 
                     # If Order Is Not Being Tracked
                     else:
@@ -594,7 +596,7 @@ class BBB:
                         # Check If Current Profit Is Above 2 Pips,
                         # Add To Tracked Orders
                         elif prop.profit > (2 * prop.volume):
-                            self.items[prop.ticket] = 1
+                            self.items[prop.ticket] = prop.profit
 
             # Wait
             sleep(1)
@@ -643,15 +645,15 @@ class BBB:
         # Update Status
         self.bot_S["active"] = True
 
-        print("BOT_S IS ACTIVE")
+        # Define variable
+        order = None
+
+        # print("BOT_S IS ACTIVE")
 
         # Initialize
-        while self.bot_S["trades"] < int(no_of_trades) / 2:
+        if self.bot_S["trades"] < (int(no_of_trades) / 2):
             # Get Current Tick Info
             info = (mt5.symbol_info(self.pair))._asdict()
-
-            # Define variable
-            order = None
 
             # Place Order
             if int(pattern) == 1:
@@ -678,24 +680,25 @@ class BBB:
             # Update Status
             self.bot_S["active"] = False
 
-            # Return
-            return order
+        # Return
+        return order
 
     # Auto Trader 2
     # ============================================================================
 
-    def auto_T2(self, price, no_of_trades, pattern):
+    def auto_T2(self, no_of_trades, pattern):
         # Update Status
         self.bot_B["active"] = True
 
-        print("BOT_B IS ACTIVE")
+        # Define variable
+        order = None
+
+        # print("BOT_B IS ACTIVE")
 
         # Initialize
-        while self.bot_B["trades"] < int(no_of_trades) / 2:
+        if self.bot_B["trades"] < (int(no_of_trades) / 2):
             # Get Current Tick Info
             info = (mt5.symbol_info(self.pair))._asdict()
-            # Define variable
-            order = None
 
             # Place Order
             if int(pattern) == 1:
@@ -722,8 +725,8 @@ class BBB:
             # Update Status
             self.bot_B["active"] = False
 
-            # Return
-            return order
+        # Return
+        return order
 
     # Start Auto Trading
     # ============================================================================
@@ -753,27 +756,15 @@ class BBB:
 
         while self.auto_trade:
             # Check RSI
-            if self.rsi > 0:
-                # Get Current Tick Info
-                info = (mt5.symbol_info(self.pair))._asdict()
+            if (self.rsi >= 70 and not self.bot_S["active"]):
+                s_a1 = threading.Thread(target=self.auto_T1, args=(
+                    no_of_trades, pattern,), daemon=False)
+                s_a1.start()
 
-                # Check If Database Has Been Updated And Number Of Existing Orders Are Not Greater Than Required
-                if len(self.H_H) > 0 and len(self.L_L) > 0:
-                    if (info["ask"] - self.bot_B["price"] > 0.3 and self.rsi >= 65) or (self.bot_B["price"] - info["ask"] > 0.3 and self.rsi >= 65):
-                        for i in range(1, 6):
-                            # Check HP
-                            if (info["ask"] - (i/10) in self.H_H and not self.bot_S["active"]) or (info["ask"] + (i/10) in self.H_H and not self.bot_S["active"]):
-                                s_a1 = threading.Thread(target=self.auto_T1, args=(
-                                    info["ask"], no_of_trades, pattern,), daemon=False)
-                                s_a1.start()
-
-                    if (self.bot_S["price"] - info["bid"] > 0.3 and self.rsi <= 35) or (info["bid"] - self.bot_S["price"] > 0.3 and self.rsi <= 35):
-                        for i in range(1, 6):
-                            # Check LP
-                            if (info["bid"] - (i/10) in self.L_L and not self.bot_B["active"]) or (info["bid"] + (i/10) in self.L_L and not self.bot_B["active"]):
-                                s_a2 = threading.Thread(target=self.auto_T2, args=(
-                                    info["bid"], no_of_trades, pattern,), daemon=False)
-                                s_a2.start()
+            if (self.rsi <= 30 and not self.bot_B["active"]):
+                s_a2 = threading.Thread(target=self.auto_T2, args=(
+                    no_of_trades, pattern,), daemon=False)
+                s_a2.start()
 
             # Wait
             sleep(5)

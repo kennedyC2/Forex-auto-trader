@@ -1,6 +1,6 @@
 # Import Dependencies
 # ==============================================================================
-from flask import Flask, jsonify, request, render_template, make_response
+from flask import Flask, jsonify, request, render_template, make_response, send_file
 from mt5.phantom import BBB
 import threading
 
@@ -86,6 +86,15 @@ def auth():
             )
             response.headers["Content-Type"] = "application/json"
             return response
+    return
+
+
+# Get Favicon
+# ==============================================================================
+@app.route("/favicon.ico", methods=["GET"])
+def favicon():
+    if request.method == "GET":
+        return send_file("./favicon/favicon.ico")
     return
 
 
@@ -423,6 +432,10 @@ def close_pending():
 def trade_start():
     if request.method == "POST":
         data = request.get_json(force=True)
+        Trader.lmt = data["lmt"]
+        Trader.gmt = data["gmt"]
+
+        # Start Auto
         Trader.auto_trade = True
 
         # Start Thread

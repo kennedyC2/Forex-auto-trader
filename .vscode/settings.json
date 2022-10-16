@@ -14,7 +14,9 @@
         "corechart",
         "curr",
         "devtn",
+        "dgmt",
         "ditr",
+        "dlmt",
         "EURAUD",
         "EURCAD",
         "EURGBP",
@@ -28,6 +30,7 @@
         "fsell",
         "fssell",
         "fstn",
+        "googlebot",
         "gridlines",
         "hloc",
         "ibuy",
@@ -55,6 +58,7 @@
         "substn",
         "TIMEFRAME",
         "timeframes",
-        "tulipy"
+        "tulipy",
+        "uline"
     ]
 }
